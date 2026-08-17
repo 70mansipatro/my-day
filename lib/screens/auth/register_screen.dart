@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
 import '../../core/utils/validators.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 
@@ -30,14 +32,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-    // Registration API call will be implemented in Phase 2.
-    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.register(
+      _nameController.text.trim(),
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authProvider.errorMessage ?? 'Something went wrong. Please try again.')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<AuthProvider>().isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Create Account')),
       body: SafeArea(
@@ -49,15 +68,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Join MyDay',
+                  'MyDay',
                   style: Theme.of(context)
                       .textTheme
-                      .headlineMedium
+                      .headlineSmall
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Create an account to get started',
+                  'Create your account',
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
@@ -106,15 +125,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                AppButton(label: 'Register', onPressed: _handleRegister),
+                AppButton(
+                  label: 'Register',
+                  isLoading: isLoading,
+                  onPressed: isLoading ? null : _handleRegister,
+                ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text('Already have an account?'),
                     TextButton(
-                      onPressed: () => Navigator.of(context)
-                          .pushReplacementNamed(AppRoutes.login),
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.login),
                       child: const Text('Login'),
                     ),
                   ],

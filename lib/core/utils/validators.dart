@@ -15,8 +15,8 @@ class Validators {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
     }
     return null;
   }
@@ -24,6 +24,12 @@ class Validators {
   static String? validateName(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Name is required';
+    }
+    if (value.trim().length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+    if (value.trim().length > 50) {
+      return 'Name must be at most 50 characters';
     }
     return null;
   }

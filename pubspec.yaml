@@ -38,6 +38,12 @@ dependencies:
   # Used by core/network/api_client.dart to call the backend REST API.
   http: ^1.2.2
 
+  # State management for authentication (AuthProvider).
+  provider: ^6.1.2
+
+  # Secure on-device storage for the JWT token.
+  flutter_secure_storage: ^9.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

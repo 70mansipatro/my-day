@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
 import '../../core/constants/app_constants.dart';
+import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,13 +16,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToLogin();
+    _init();
   }
 
-  Future<void> _navigateToLogin() async {
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _init() async {
+    final authProvider = context.read<AuthProvider>();
+    await Future.wait([
+      authProvider.checkAuthStatus(),
+      Future.delayed(const Duration(milliseconds: 1200)),
+    ]);
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+
+    final destination =
+        authProvider.isAuthenticated ? AppRoutes.home : AppRoutes.login;
+    Navigator.of(context).pushNamedAndRemoveUntil(destination, (route) => false);
   }
 
   @override
@@ -51,6 +60,8 @@ class _SplashScreenState extends State<SplashScreen> {
               AppConstants.appTagline,
               style: const TextStyle(fontSize: 16, color: Colors.white70),
             ),
+            const SizedBox(height: 32),
+            const CircularProgressIndicator(color: Colors.white),
           ],
         ),
       ),

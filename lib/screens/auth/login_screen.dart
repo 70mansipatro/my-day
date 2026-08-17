@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
 import '../../core/utils/validators.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 
@@ -25,14 +27,30 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    // Real authentication will be implemented in Phase 2.
-    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authProvider.errorMessage ?? 'Something went wrong. Please try again.')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<AuthProvider>().isLoading;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -43,6 +61,14 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
+                Text(
+                  'MyDay',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
                 Text(
                   'Welcome Back',
                   style: Theme.of(context)
@@ -79,25 +105,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // Forgot password flow will be implemented in Phase 2.
-                    },
-                    child: const Text('Forgot Password?'),
-                  ),
+                const SizedBox(height: 24),
+                AppButton(
+                  label: 'Login',
+                  isLoading: isLoading,
+                  onPressed: isLoading ? null : _handleLogin,
                 ),
-                const SizedBox(height: 16),
-                AppButton(label: 'Login', onPressed: _handleLogin),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Don't have an account?"),
                     TextButton(
-                      onPressed: () =>
-                          Navigator.of(context).pushNamed(AppRoutes.register),
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.of(context).pushNamed(AppRoutes.register),
                       child: const Text('Register'),
                     ),
                   ],

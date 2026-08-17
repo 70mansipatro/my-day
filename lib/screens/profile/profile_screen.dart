@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
+import '../../providers/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  Future<void> _handleLogout(BuildContext context) async {
+    await context.read<AuthProvider>().logout();
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: ListView(
@@ -17,13 +27,13 @@ class ProfileScreen extends StatelessWidget {
             child: Icon(Icons.person, size: 40),
           ),
           const SizedBox(height: 12),
-          const Center(
+          Center(
             child: Text(
-              'Guest User',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              user?.name ?? '',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ),
-          const Center(child: Text('guest@myday.com')),
+          Center(child: Text(user?.email ?? '')),
           const SizedBox(height: 32),
           Text('Settings', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
@@ -53,11 +63,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           OutlinedButton.icon(
-            onPressed: () {
-              // Real logout logic will be implemented in Phase 2.
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
-            },
+            onPressed: () => _handleLogout(context),
             icon: const Icon(Icons.logout),
             label: const Text('Logout'),
           ),
