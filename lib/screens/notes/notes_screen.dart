@@ -200,7 +200,7 @@ class _NotesScreenState extends State<NotesScreen> {
         child: Column(
           children: [
             const Padding(
-              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: ScreenHeaderImage(asset: 'assets/images/FJRyR.jpg'),
             ),
             Padding(

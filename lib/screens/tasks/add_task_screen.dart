@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/task_provider.dart';
-import '../../widgets/full_visible_hero_image.dart';
+import '../../widgets/screen_header_image.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -87,8 +87,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const FullVisibleHeroImage(
-                      imagePath: 'assets/images/FJRyR.jpg',
+                    const ScreenHeaderImage(
+                      asset: 'assets/images/FJRyR.jpg',
                     ),
                     const SizedBox(height: 20),
                     TextFormField(

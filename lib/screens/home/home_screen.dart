@@ -7,7 +7,7 @@ import '../../core/utils/responsive.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../providers/task_provider.dart';
-import '../../widgets/full_visible_hero_image.dart';
+import '../../widgets/screen_header_image.dart';
 import '../habits/add_habit_screen.dart';
 import '../habits/habits_screen.dart';
 import '../notes/add_note_screen.dart';
@@ -408,39 +408,28 @@ class _HomeTabState extends State<_HomeTab> {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
-              FullVisibleHeroImage(
-                imagePath: 'assets/images/ep2vo.jpg',
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        greeting,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.gray800,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Let's make today productive and meaningful.",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.gray800,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        dashboard.date,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.gray600,
-                        ),
-                      ),
-                    ],
-                  ),
+              const ScreenHeaderImage(asset: 'assets/images/ep2vo.jpg'),
+              const SizedBox(height: 16),
+              Text(
+                greeting,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.gray800,
                 ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Let's make today productive and meaningful.",
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.gray800),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                dashboard.date,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.gray600),
               ),
               const SizedBox(height: 24),
 

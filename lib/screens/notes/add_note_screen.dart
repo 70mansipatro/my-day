@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/note_model.dart';
 import '../../providers/note_provider.dart';
-import '../../widgets/full_visible_hero_image.dart';
+import '../../widgets/screen_header_image.dart';
 
 class AddNoteScreen extends StatefulWidget {
   final NoteModel? note;
@@ -125,8 +125,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const FullVisibleHeroImage(
-                      imagePath: 'assets/images/yXKYN.jpg',
+                    const ScreenHeaderImage(
+                      asset: 'assets/images/yXKYN.jpg',
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
