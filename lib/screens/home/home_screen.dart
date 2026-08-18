@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/utils/date_utils.dart';
+import '../../providers/note_provider.dart';
 import '../../providers/task_provider.dart';
 import '../habits/habits_screen.dart';
 import '../notes/notes_screen.dart';
@@ -83,18 +84,21 @@ class _HomeTabState extends State<_HomeTab> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskProvider>().loadTasks();
+      context.read<NoteProvider>().loadNotes();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final taskProvider = context.watch<TaskProvider>();
+    final noteProvider = context.watch<NoteProvider>();
     final now = DateTime.now();
     final greeting = AppDateUtils.greetingForNow(now);
     final today = AppDateUtils.formatFullDate(now);
     final total = taskProvider.totalTasks;
     final completed = taskProvider.completedTasks;
     final pending = taskProvider.pendingTasks;
+    final recentNotes = noteProvider.recentNotes;
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -133,6 +137,46 @@ class _HomeTabState extends State<_HomeTab> {
           subtitle:
               '${taskProvider.completionRate.toStringAsFixed(0)}% complete',
         ),
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recent Notes',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const NotesScreen())),
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (recentNotes.isEmpty)
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.note_alt_outlined),
+              title: const Text('No notes yet'),
+              subtitle: const Text('Create your first note'),
+            ),
+          )
+        else
+          ...recentNotes.map(
+            (note) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Card(
+                child: ListTile(
+                  title: Text(note.title),
+                  subtitle: Text(note.category),
+                  trailing: note.isFavorite
+                      ? const Icon(Icons.star, color: Colors.amber)
+                      : null,
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

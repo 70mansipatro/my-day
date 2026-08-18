@@ -21,15 +21,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _init() async {
     final authProvider = context.read<AuthProvider>();
-    await Future.wait([
-      authProvider.checkAuthStatus(),
-      Future.delayed(const Duration(milliseconds: 1200)),
-    ]);
-    if (!mounted) return;
 
-    final destination =
-        authProvider.isAuthenticated ? AppRoutes.home : AppRoutes.login;
-    Navigator.of(context).pushNamedAndRemoveUntil(destination, (route) => false);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.wait([
+        authProvider.checkAuthStatus(),
+        Future.delayed(const Duration(milliseconds: 1200)),
+      ]);
+      if (!mounted) return;
+
+      final destination = authProvider.isAuthenticated
+          ? AppRoutes.home
+          : AppRoutes.login;
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(destination, (route) => false);
+    });
   }
 
   @override

@@ -3,9 +3,97 @@
 MyDay is a full-stack personal productivity app for tracking tasks, notes,
 and habits. **Plan. Track. Grow.**
 
-This repository includes **Phase 3: Task Management**. The app now supports
-secure, user-scoped task CRUD, searching, filtering, sorting, and dashboard
-summaries across the Flutter client and the Express + MongoDB backend.
+This repository includes **Phase 4: Notes Management**. The app now supports
+secure, user-scoped note CRUD, searching, filtering, sorting, favorites, and
+home-screen summaries across the Flutter client and the Express + MongoDB backend.
+
+## Phase 4 - Notes Module
+
+### Features
+
+- Create notes for the authenticated user only
+- View all notes and a single note by ID
+- Edit existing notes
+- Delete notes with confirmation in the UI
+- Toggle favorite status
+- Search by title and content
+- Filter by category and favorites
+- Sort by newest, oldest, or favorites
+- Recent notes card on the Home screen
+- Secure user-specific access with JWT-bound queries
+
+### Note API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| GET | `/api/notes` | Yes | List notes for the logged-in user |
+| POST | `/api/notes` | Yes | Create a note |
+| GET | `/api/notes/:id` | Yes | Fetch a single note |
+| PUT | `/api/notes/:id` | Yes | Update a note |
+| PATCH | `/api/notes/:id/favorite` | Yes | Toggle favorite |
+| DELETE | `/api/notes/:id` | Yes | Remove a note |
+
+### Note Model
+
+The backend uses a Mongoose `Note` model in `backend/src/models/Note.js` with the
+following fields:
+
+- `userId`: required `ObjectId` reference to `User`
+- `title`: required, trimmed, 1-150 characters
+- `content`: required, trimmed, 1-10000 characters
+- `category`: optional, trimmed, max 50 characters, default `General`
+- `isFavorite`: boolean, default `false`
+- `createdAt` / `updatedAt`: managed automatically by Mongoose timestamps
+
+### Authentication Requirement
+
+All note requests require a valid JWT in the `Authorization: Bearer <token>`
+header. The backend reads the verified `req.userId` from the token and never
+trusts a client-supplied `userId`.
+
+### User Data Isolation
+
+Every note query is restricted to the authenticated user's ID. A user cannot
+read, update, or delete another user's notes. If a note is not found for that
+user, the API returns `404 { success: false, message: 'Note not found' }`.
+
+### Search, Filter, and Sort
+
+- `GET /api/notes?search=flutter` searches title and content case-insensitively
+- `GET /api/notes?category=Study`
+- `GET /api/notes?favorite=true|false`
+- `GET /api/notes?sort=newest|oldest|favorite`
+- Combined filters can be used together safely in a single query
+
+### Flutter Screens
+
+- Notes list screen with search, filter, and sort
+- Add note screen
+- Edit note screen
+- Note detail screen
+- Home dashboard recent notes card
+
+### Testing Instructions
+
+Backend:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Then call the protected endpoints with a valid bearer token from a successful
+login request.
+
+Flutter:
+
+```bash
+flutter pub get
+flutter run
+```
+
+For Android emulator testing, the app uses `10.0.2.2` to reach the host API.
 
 ## Phase 3 - Task Management
 
