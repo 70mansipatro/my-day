@@ -20,12 +20,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordFocus = FocusNode();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
@@ -93,6 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: 'Email',
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.validateEmail,
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
@@ -100,6 +104,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: 'Password',
                   obscureText: _obscurePassword,
                   validator: Validators.validatePassword,
+                  focusNode: _passwordFocus,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => isLoading ? null : _handleLogin(),
                   suffixIcon: IconButton(
                     icon: Icon(_obscurePassword
                         ? Icons.visibility_off
@@ -108,7 +115,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
-                const SizedBox(height: 24),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: isLoading
+                        ? null
+                        : () => Navigator.of(context).pushNamed(AppRoutes.forgotPassword),
+                    child: const Text('Forgot Password?'),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 AppButton(
                   label: 'Login',
                   isLoading: isLoading,

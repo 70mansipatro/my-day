@@ -20,8 +20,16 @@ const loginValidation = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
+const resetPasswordValidation = [
+  body('email').trim().isEmail().withMessage('Enter a valid email address').normalizeEmail(),
+  body('newPassword')
+    .isLength({ min: 8, max: 72 })
+    .withMessage('Password must be between 8 and 72 characters'),
+];
+
 router.post('/register', registerValidation, authController.register);
 router.post('/login', loginValidation, authController.login);
+router.post('/reset-password', resetPasswordValidation, authController.resetPassword);
 router.get('/me', authMiddleware, authController.getMe);
 router.post('/logout', authMiddleware, authController.logout);
 

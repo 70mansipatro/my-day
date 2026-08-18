@@ -50,6 +50,16 @@ class AuthService {
     await _apiClient.post('${ApiConstants.auth}/logout', const {}, requiresAuth: true);
   }
 
+  Future<void> resetPassword({
+    required String email,
+    required String newPassword,
+  }) async {
+    await _apiClient.post('${ApiConstants.auth}/reset-password', {
+      'email': email,
+      'newPassword': newPassword,
+    });
+  }
+
   AuthResult _parseAuthResult(Map<String, dynamic> body) {
     final data = body['data'] as Map<String, dynamic>;
     return AuthResult(

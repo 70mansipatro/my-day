@@ -2,58 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_colors.dart';
-import '../../app/routes.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
-import '../../widgets/screen_header_image.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _emailFocus = FocusNode();
-  final _passwordFocus = FocusNode();
+  final _newPasswordFocus = FocusNode();
   final _confirmPasswordFocus = FocusNode();
-  bool _obscurePassword = true;
+  bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
+    _newPasswordController.dispose();
     _confirmPasswordController.dispose();
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
+    _newPasswordFocus.dispose();
     _confirmPasswordFocus.dispose();
     super.dispose();
   }
 
-  Future<void> _handleRegister() async {
+  Future<void> _handleResetPassword() async {
     if (!_formKey.currentState!.validate()) return;
 
     final authProvider = context.read<AuthProvider>();
-    final success = await authProvider.register(
-      _nameController.text.trim(),
+    final success = await authProvider.resetPassword(
       _emailController.text.trim(),
-      _passwordController.text,
+      _newPasswordController.text,
     );
 
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset successful. Please login.')),
+      );
+      Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(authProvider.errorMessage ?? 'Something went wrong. Please try again.')),
@@ -66,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isLoading = context.watch<AuthProvider>().isLoading;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Account')),
+      appBar: AppBar(title: const Text('Reset Password')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -75,18 +71,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const ScreenHeaderImage(asset: 'assets/images/31sTr.jpg'),
-                const SizedBox(height: 24),
                 Text(
-                  'MyDay',
+                  'Reset your password',
                   style: Theme.of(context)
                       .textTheme
-                      .headlineSmall
+                      .headlineMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Create your account',
+                  'Enter your email and choose a new password',
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
@@ -94,49 +88,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
                 AppTextField(
-                  controller: _nameController,
-                  label: 'Name',
-                  validator: Validators.validateName,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => _emailFocus.requestFocus(),
-                ),
-                const SizedBox(height: 16),
-                AppTextField(
                   controller: _emailController,
                   label: 'Email',
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.validateEmail,
-                  focusNode: _emailFocus,
                   textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
+                  onFieldSubmitted: (_) => _newPasswordFocus.requestFocus(),
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
-                  controller: _passwordController,
-                  label: 'Password',
-                  obscureText: _obscurePassword,
+                  controller: _newPasswordController,
+                  label: 'New Password',
+                  obscureText: _obscureNewPassword,
                   validator: Validators.validatePassword,
-                  focusNode: _passwordFocus,
+                  focusNode: _newPasswordFocus,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _confirmPasswordFocus.requestFocus(),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword
+                    icon: Icon(_obscureNewPassword
                         ? Icons.visibility_off
                         : Icons.visibility),
                     onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                        setState(() => _obscureNewPassword = !_obscureNewPassword),
                   ),
                 ),
                 const SizedBox(height: 16),
                 AppTextField(
                   controller: _confirmPasswordController,
-                  label: 'Confirm Password',
+                  label: 'Confirm New Password',
                   obscureText: _obscureConfirmPassword,
                   validator: (value) => Validators.validateConfirmPassword(
-                      value, _passwordController.text),
+                      value, _newPasswordController.text),
                   focusNode: _confirmPasswordFocus,
                   textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => isLoading ? null : _handleRegister(),
+                  onFieldSubmitted: (_) => isLoading ? null : _handleResetPassword(),
                   suffixIcon: IconButton(
                     icon: Icon(_obscureConfirmPassword
                         ? Icons.visibility_off
@@ -147,23 +132,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 AppButton(
-                  label: 'Register',
+                  label: 'Reset Password',
                   isLoading: isLoading,
-                  onPressed: isLoading ? null : _handleRegister,
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Already have an account?'),
-                    TextButton(
-                      onPressed: isLoading
-                          ? null
-                          : () => Navigator.of(context)
-                              .pushReplacementNamed(AppRoutes.login),
-                      child: const Text('Login'),
-                    ),
-                  ],
+                  onPressed: isLoading ? null : _handleResetPassword,
                 ),
               ],
             ),

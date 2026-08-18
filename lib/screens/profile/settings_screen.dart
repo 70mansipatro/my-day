@@ -23,24 +23,12 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.notifications_outlined),
-                  title: const Text('Notifications'),
-                  subtitle: const Text('Manage notification preferences'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showFeatureComingSoon(context),
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.lock_outline),
-                  title: const Text('Privacy & Security'),
-                  subtitle: const Text('Control your data and privacy'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showFeatureComingSoon(context),
-                ),
-              ],
+            child: ListTile(
+              leading: const Icon(Icons.notifications_outlined),
+              title: const Text('Notifications'),
+              subtitle: const Text('Manage notification preferences'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _showFeatureComingSoon(context),
             ),
           ),
           const SizedBox(height: 24),
@@ -60,35 +48,6 @@ class SettingsScreen extends StatelessWidget {
               onTap: () => Navigator.of(
                 context,
               ).push(MaterialPageRoute(builder: (_) => const AboutScreen())),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Help',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.help_outline),
-                  title: const Text('FAQ'),
-                  subtitle: const Text('Frequently asked questions'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showFeatureComingSoon(context),
-                ),
-                const Divider(height: 0),
-                ListTile(
-                  leading: const Icon(Icons.feedback_outlined),
-                  title: const Text('Send Feedback'),
-                  subtitle: const Text('Help us improve MyDay'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showFeatureComingSoon(context),
-                ),
-              ],
             ),
           ),
         ],

@@ -104,6 +104,29 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> resetPassword(String email, String newPassword) async {
+    _status = AuthStatus.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _authService.resetPassword(email: email, newPassword: newPassword);
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return false;
+    } catch (_) {
+      _errorMessage = 'Something went wrong. Please try again.';
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     try {
       await _authService.logout();

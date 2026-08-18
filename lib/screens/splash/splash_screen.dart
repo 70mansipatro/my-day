@@ -47,36 +47,39 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: colorScheme.primary,
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: ScreenHeaderImage(asset: 'assets/images/aOpdG.jpg'),
-              ),
-              const SizedBox(height: 24),
-              const Icon(
-                Icons.check_circle_outline,
-                size: 80,
-                color: AppColors.gray800,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                AppConstants.appName,
-                style: const TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  child: ScreenHeaderImage(asset: 'assets/images/aOpdG.jpg'),
+                ),
+                const SizedBox(height: 24),
+                const Icon(
+                  Icons.check_circle_outline,
+                  size: 80,
                   color: AppColors.gray800,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppConstants.appTagline,
-                style: const TextStyle(fontSize: 16, color: AppColors.gray600),
-              ),
-              const SizedBox(height: 32),
-              const CircularProgressIndicator(color: AppColors.gray800),
-            ],
+                const SizedBox(height: 16),
+                Text(
+                  AppConstants.appName,
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.gray800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppConstants.appTagline,
+                  style: const TextStyle(fontSize: 16, color: AppColors.gray600),
+                ),
+                const SizedBox(height: 32),
+                const CircularProgressIndicator(color: AppColors.gray800),
+              ],
+            ),
           ),
         ),
       ),
