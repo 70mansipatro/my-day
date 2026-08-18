@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/dashboard_provider.dart';
-import '../../services/dashboard_service.dart';
 import '../habits/habits_screen.dart';
 import '../notes/notes_screen.dart';
 import '../profile/profile_screen.dart';
@@ -92,7 +91,6 @@ class _HomeTabState extends State<_HomeTab> {
     final dashboardProvider = context.watch<DashboardProvider>();
     final dashboard = dashboardProvider.dashboard;
     final isLoading = dashboardProvider.isLoading;
-    final isRefreshing = dashboardProvider.isRefreshing;
     final error = dashboardProvider.errorMessage;
 
     // Show loading state
