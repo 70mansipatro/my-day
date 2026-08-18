@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/utils/date_utils.dart';
+import '../../providers/task_provider.dart';
 import '../habits/habits_screen.dart';
 import '../notes/notes_screen.dart';
 import '../profile/profile_screen.dart';
@@ -29,10 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: IndexedStack(index: _selectedIndex, children: _tabs)),
+      body: SafeArea(
+        child: IndexedStack(index: _selectedIndex, children: _tabs),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+        onDestinationSelected: (index) =>
+            setState(() => _selectedIndex = index),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -65,50 +70,68 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeTab extends StatelessWidget {
+class _HomeTab extends StatefulWidget {
   const _HomeTab();
 
   @override
+  State<_HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<_HomeTab> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TaskProvider>().loadTasks();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final taskProvider = context.watch<TaskProvider>();
     final now = DateTime.now();
     final greeting = AppDateUtils.greetingForNow(now);
     final today = AppDateUtils.formatFullDate(now);
+    final total = taskProvider.totalTasks;
+    final completed = taskProvider.completedTasks;
+    final pending = taskProvider.pendingTasks;
 
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         Text(
           greeting,
-          style: Theme.of(context)
-              .textTheme
-              .headlineSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
           today,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: Colors.grey.shade600),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
         ),
         const SizedBox(height: 24),
-        const _SummaryCard(
+        _SummaryCard(
           icon: Icons.check_circle_outline,
           title: "Today's Tasks",
-          subtitle: 'No tasks yet',
+          subtitle: total == 0
+              ? 'No tasks yet'
+              : '$completed of $total completed',
         ),
         const SizedBox(height: 12),
-        const _SummaryCard(
-          icon: Icons.track_changes_outlined,
-          title: 'Habits',
-          subtitle: 'No habits yet',
+        _SummaryCard(
+          icon: Icons.fact_check_outlined,
+          title: 'Total Tasks',
+          subtitle: '$total total • $pending pending',
         ),
         const SizedBox(height: 12),
-        const _SummaryCard(
+        _SummaryCard(
           icon: Icons.note_outlined,
-          title: 'Quick Notes',
-          subtitle: 'No notes yet',
+          title: 'Task Completion',
+          subtitle:
+              '${taskProvider.completionRate.toStringAsFixed(0)}% complete',
         ),
       ],
     );

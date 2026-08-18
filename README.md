@@ -3,11 +3,311 @@
 MyDay is a full-stack personal productivity app for tracking tasks, notes,
 and habits. **Plan. Track. Grow.**
 
-This repository is at the end of **Phase 2**: a complete, secure
-authentication system (register, login, session persistence, logout) is
-implemented end-to-end across the Flutter app and the Node.js API. Tasks,
-Notes, and Habits CRUD are **not** implemented yet — see
-[What's Next](#13-whats-next-phase-3).
+This repository includes **Phase 3: Task Management**. The app now supports
+secure, user-scoped task CRUD, searching, filtering, sorting, and dashboard
+summaries across the Flutter client and the Express + MongoDB backend.
+
+## Phase 3 - Task Management
+
+### Features
+
+- Create tasks for the authenticated user only
+- View all tasks, a single task, and task details
+- Edit existing tasks
+- Toggle completed state
+- Delete tasks with confirmation in the UI
+- Search by title and description
+- Filter by status, priority, and category
+- Sort by newest, oldest, due date, or priority
+- Dashboard stats for total, completed, pending, and completion percentage
+- Secure user-specific access with JWT-bound queries
+
+### Task API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| GET | `/api/tasks` | Yes | List tasks for the logged-in user |
+| POST | `/api/tasks` | Yes | Create a task |
+| GET | `/api/tasks/:id` | Yes | Fetch one task |
+| PUT | `/api/tasks/:id` | Yes | Update a task |
+| PATCH | `/api/tasks/:id/toggle` | Yes | Toggle completion |
+| DELETE | `/api/tasks/:id` | Yes | Remove a task |
+
+### Task Model
+
+The backend uses a Mongoose `Task` model in `backend/src/models/Task.js` with the
+following fields:
+
+- `userId`: required `ObjectId` reference to `User`
+- `title`: required, trimmed, 1-150 characters
+- `description`: optional, trimmed, max 1000 characters
+- `priority`: `low | medium | high` with default `medium`
+- `completed`: boolean with default `false`
+- `dueDate`: optional `Date`
+- `category`: optional, trimmed, max 50 characters
+- `createdAt` / `updatedAt`: managed automatically by Mongoose timestamps
+
+### Authentication Requirement
+
+All task requests require a valid JWT in the `Authorization: Bearer <token>`
+header. The backend reads the verified `req.userId` from the token and never
+trusts a client-supplied `userId`.
+
+### User Data Isolation
+
+Every task query is restricted to the authenticated user's ID. A user cannot
+read, update, or delete another user's tasks. If a task is not found for that
+user, the API returns `404 { success: false, message: 'Task not found' }`.
+
+### Search, Filter, and Sort
+
+- `GET /api/tasks?search=flutter` searches title and description case-insensitively
+- `GET /api/tasks?completed=true|false`
+- `GET /api/tasks?priority=low|medium|high`
+- `GET /api/tasks?category=Study`
+- `GET /api/tasks?sort=newest|oldest|dueDate|priority`
+
+### Flutter Screens
+
+- Task list screen
+- Add task screen
+- Edit task screen
+- Task detail screen
+- Home dashboard summary with real task stats
+
+### Testing Instructions
+
+Backend:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Then call the protected endpoints with a valid bearer token from a successful
+login request.
+
+Flutter:
+
+```bash
+flutter pub get
+flutter run
+```
+
+For Android emulator testing, the app uses `10.0.2.2` to reach the host API.
+This project intentionally keeps the backend and frontend responsibilities
+separate while using the same secure JWT authentication flow.
+
+## 1. Project Overview
+
+- Flutter mobile app with a splash-screen session check, login/register
+  screens, and a bottom-navigation home shell — all gated behind
+  authentication.
+- Node.js + Express REST API with JWT-based authentication, bcrypt password
+  hashing, and input validation.
+- MongoDB Atlas database with a Mongoose `User` schema (hashed passwords
+  only, never returned in API responses).
+
+## 2. Tech Stack
+
+| Layer     | Technology                                  |
+|-----------|----------------------------------------------|
+| Frontend  | Flutter (Dart), Material 3, Provider          |
+| Backend   | Node.js, Express.js                           |
+| Database  | MongoDB Atlas, Mongoose                       |
+| Auth      | JWT (jsonwebtoken), bcryptjs                  |
+| Validation| express-validator                             |
+| Storage   | flutter_secure_storage (JWT), not SharedPreferences |
+| HTTP      | `http` package (Flutter)                      |
+
+## 3. Phase 2 — Authentication
+
+### 3.1 API Endpoints
+
+| Method | Endpoint             | Auth required | Description                          |
+|--------|-----------------------|:-------------:|---------------------------------------|
+| POST   | `/api/auth/register`  | No            | Create a user, returns user + JWT     |
+| POST   | `/api/auth/login`     | No            | Validate credentials, returns user + JWT |
+| GET    | `/api/auth/me`        | Yes           | Return the current authenticated user |
+| POST   | `/api/auth/logout`    | Yes           | Stateless logout acknowledgement      |
+
+All responses follow the shape `{ success, message?, data? }`. Errors never
+leak stack traces, database errors, or secrets.
+
+### 3.2 JWT Authentication
+
+- On register/login, the server signs a JWT containing only `{ userId }`
+  using `JWT_SECRET`, expiring after `JWT_EXPIRES_IN` (default `7d`).
+- Protected routes require `Authorization: Bearer <token>`. The
+  `authMiddleware` (`backend/src/middleware/authMiddleware.js`) verifies the
+  token and attaches `req.userId` — this id is never trusted from the client.
+- Invalid, missing, or expired tokens return `401 { success: false, message:
+  "Unauthorized" }`.
+
+### 3.3 Password Security
+
+- Passwords are hashed with `bcryptjs` in a Mongoose `pre('save')` hook
+  before being written to MongoDB — plaintext passwords are never stored.
+- The `password` field uses `select: false`, so it is excluded from queries
+  by default and never returned in any API response.
+- Login compares the submitted password against the stored hash with
+  `bcrypt.compare()`.
+
+### 3.4 MongoDB User Collection
+
+Database: `myday`, collection: `users`.
+
+```json
+{
+  "_id": "665f1a2b3c4d5e6f7a8b9c0d",
+  "name": "Mansi",
+  "email": "mansi@example.com",
+  "password": "$2b$10$examplehashvalue...",
+  "createdAt": "2026-08-17T10:00:00.000Z",
+  "updatedAt": "2026-08-17T10:00:00.000Z"
+}
+```
+
+### 3.5 Flutter Authentication Flow
+
+```
+Splash Screen
+      |
+Check secure storage for JWT
+      |
+Token exists? --- NO ---> Login Screen
+      | YES
+GET /api/auth/me
+      |
+Valid? --- NO ---> delete token, clear user state ---> Login Screen
+      | YES
+Home Screen
+```
+
+- `SecureStorageService` (`lib/core/storage/secure_storage_service.dart`)
+  wraps `flutter_secure_storage` — the JWT is never stored with
+  SharedPreferences, printed to the console, or shown in the UI.
+- `AuthProvider` (`lib/providers/auth_provider.dart`) exposes `AuthStatus`
+  (`unknown`, `loading`, `authenticated`, `unauthenticated`), the current
+  user, and `login()` / `register()` / `logout()` / `checkAuthStatus()`.
+- `ApiClient` (`lib/core/network/api_client.dart`) attaches the bearer token
+  to authenticated requests and, on a `401`, clears the session and routes
+  the user back to Login automatically.
+- After login/register/logout, the navigation stack is cleared with
+  `pushNamedAndRemoveUntil` so the back button can't return an authenticated
+  user to Login/Register, or a logged-out user back to Home.
+
+## 4. Flutter Setup
+
+Requirements: Flutter SDK (3.x), an Android emulator or device.
+
+```bash
+flutter pub get
+flutter run
+```
+
+## 5. Backend Setup
+
+Requirements: Node.js 18+.
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+## 6. MongoDB Atlas Setup
+
+1. Create a free account at https://www.mongodb.com/cloud/atlas.
+2. Create a new Cluster (the free M0 tier is enough for development).
+3. Under **Database Access**, create a database user with a username and
+   password.
+4. Under **Network Access**, add your current IP address (or
+   `0.0.0.0/0` for local development only).
+5. Click **Connect > Drivers** and copy the connection string. It looks
+   like:
+   `mongodb+srv://<username>:<password>@<cluster-url>/myday?retryWrites=true&w=majority`
+6. Paste that string into `backend/.env` as `MONGO_URI`, using `myday` as
+   the database name.
+
+## 7. Environment Variables
+
+Backend configuration lives in `backend/.env` (never commit this file — it
+is already listed in `backend/.gitignore`). Copy `backend/.env.example` and
+fill in your own values:
+
+```
+PORT=5000
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_long_random_secret
+JWT_EXPIRES_IN=7d
+```
+
+`JWT_SECRET` should be a long, random string — never reuse the example
+value in a real deployment. Never commit real credentials, connection
+strings, or secrets.
+
+## 8. How to Run the Backend
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+The API starts on `http://localhost:5000` (or the port set in `.env`).
+
+## 9. How to Run the Flutter App
+
+```bash
+flutter pub get
+flutter run
+```
+
+Select an emulator/device when prompted, or run with a specific device id,
+for example: `flutter run -d emulator-5554`.
+
+## 10. Android Emulator API URL
+
+The Android emulator can't reach your machine via `localhost`. It uses the
+special alias `10.0.2.2` instead. This is already configured in
+`lib/core/constants/api_constants.dart`:
+
+```dart
+static const String baseUrl = 'http://10.0.2.2:5000/api';
+```
+
+For a physical device, replace this with your computer's LAN IP
+(e.g. `http://192.168.1.10:5000/api`). For production, replace it with your
+deployed API URL. Keep this centralized in `api_constants.dart` — don't
+hardcode the base URL anywhere else.
+
+## 11. Testing the Backend
+
+With the backend running (`cd backend && npm run dev`), using curl or
+Postman:
+
+```bash
+# 1. Register a new user
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Mansi","email":"mansi@example.com","password":"Password123"}'
+
+# 2. Register the same email again -> 409 "Email already registered"
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Mansi","email":"mansi@example.com","password":"Password123"}'
+
+# 3. Login with correct credentials -> 200 + token
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"mansi@example.com","password":"Password123"}'
+
+# 4. Login with the wrong password -> 401 "Invalid email or password"
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"mansi@example.com","password":"WrongPass1"}'
 
 ## 1. Project Overview
 

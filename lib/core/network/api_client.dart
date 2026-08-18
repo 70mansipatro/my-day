@@ -32,8 +32,8 @@ class ApiClient {
   void Function()? onUnauthorized;
 
   ApiClient({http.Client? client, SecureStorageService? storage})
-      : _client = client ?? http.Client(),
-        _storage = storage ?? SecureStorageService();
+    : _client = client ?? http.Client(),
+      _storage = storage ?? SecureStorageService();
 
   Uri _uri(String endpoint) => Uri.parse('${ApiConstants.baseUrl}$endpoint');
 
@@ -51,7 +51,10 @@ class ApiClient {
     return headers;
   }
 
-  Future<Map<String, dynamic>> get(String endpoint, {bool requiresAuth = false}) {
+  Future<Map<String, dynamic>> get(
+    String endpoint, {
+    bool requiresAuth = false,
+  }) {
     return _send(
       requiresAuth: requiresAuth,
       request: (headers) => _client.get(_uri(endpoint), headers: headers),
@@ -65,8 +68,11 @@ class ApiClient {
   }) {
     return _send(
       requiresAuth: requiresAuth,
-      request: (headers) =>
-          _client.post(_uri(endpoint), headers: headers, body: jsonEncode(body)),
+      request: (headers) => _client.post(
+        _uri(endpoint),
+        headers: headers,
+        body: jsonEncode(body),
+      ),
     );
   }
 
@@ -82,7 +88,25 @@ class ApiClient {
     );
   }
 
-  Future<Map<String, dynamic>> delete(String endpoint, {bool requiresAuth = false}) {
+  Future<Map<String, dynamic>> patch(
+    String endpoint,
+    Map<String, dynamic> body, {
+    bool requiresAuth = false,
+  }) {
+    return _send(
+      requiresAuth: requiresAuth,
+      request: (headers) => _client.patch(
+        _uri(endpoint),
+        headers: headers,
+        body: jsonEncode(body),
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>> delete(
+    String endpoint, {
+    bool requiresAuth = false,
+  }) {
     return _send(
       requiresAuth: requiresAuth,
       request: (headers) => _client.delete(_uri(endpoint), headers: headers),
@@ -91,7 +115,8 @@ class ApiClient {
 
   Future<Map<String, dynamic>> _send({
     required bool requiresAuth,
-    required Future<http.Response> Function(Map<String, String> headers) request,
+    required Future<http.Response> Function(Map<String, String> headers)
+    request,
   }) async {
     http.Response response;
     try {
@@ -114,7 +139,10 @@ class ApiClient {
     return _handleResponse(response, requiresAuth: requiresAuth);
   }
 
-  Map<String, dynamic> _handleResponse(http.Response response, {required bool requiresAuth}) {
+  Map<String, dynamic> _handleResponse(
+    http.Response response, {
+    required bool requiresAuth,
+  }) {
     Map<String, dynamic> body = const {};
     if (response.body.isNotEmpty) {
       try {
@@ -134,7 +162,8 @@ class ApiClient {
       onUnauthorized?.call();
     }
 
-    final message = body['message'] as String? ?? _fallbackMessage(response.statusCode);
+    final message =
+        body['message'] as String? ?? _fallbackMessage(response.statusCode);
     throw ApiException(message, statusCode: response.statusCode);
   }
 
