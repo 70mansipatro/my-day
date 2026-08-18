@@ -5,6 +5,7 @@ import '../../app/app_colors.dart';
 import '../../app/routes.dart';
 import '../../core/constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/screen_header_image.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -48,6 +49,14 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40),
+              child: ScreenHeaderImage(
+                asset: 'assets/images/aOpdG.jpg',
+                height: 180,
+              ),
+            ),
+            const SizedBox(height: 24),
             const Icon(
               Icons.check_circle_outline,
               size: 80,

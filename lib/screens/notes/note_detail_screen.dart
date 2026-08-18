@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_colors.dart';
 import '../../models/note_model.dart';
 import '../../providers/note_provider.dart';
+import '../../widgets/screen_header_image.dart';
 import 'add_note_screen.dart';
 
 class NoteDetailScreen extends StatelessWidget {
@@ -71,6 +72,8 @@ class NoteDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const ScreenHeaderImage(asset: 'assets/images/cc7r7.jpg'),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(

@@ -7,6 +7,7 @@ import '../habits/habits_screen.dart';
 import '../notes/notes_screen.dart';
 import '../profile/profile_screen.dart';
 import '../tasks/tasks_screen.dart';
+import '../../widgets/screen_header_image.dart';
 import 'dashboard_widgets.dart';
 
 /// Hosts the bottom navigation shell shared by Home, Tasks, Notes, Habits
@@ -181,6 +182,8 @@ class _HomeTabState extends State<_HomeTab> {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          const ScreenHeaderImage(asset: 'assets/images/ep2vo.jpg'),
+          const SizedBox(height: 20),
           // Greeting and date
           Text(
             dashboard.greeting,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/habit_model.dart';
 import '../../providers/habit_provider.dart';
+import '../../widgets/screen_header_image.dart';
 
 class AddHabitScreen extends StatefulWidget {
   final HabitModel? habit;
@@ -126,6 +127,8 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const ScreenHeaderImage(asset: 'assets/images/Bz5Wj.jpg'),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(labelText: 'Habit name'),

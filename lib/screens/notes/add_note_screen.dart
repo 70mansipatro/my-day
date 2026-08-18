@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/note_model.dart';
 import '../../providers/note_provider.dart';
+import '../../widgets/screen_header_image.dart';
 
 class AddNoteScreen extends StatefulWidget {
   final NoteModel? note;
@@ -121,6 +122,8 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const ScreenHeaderImage(asset: 'assets/images/yXKYN.jpg'),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(labelText: 'Title'),

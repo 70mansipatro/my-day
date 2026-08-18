@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_colors.dart';
 import '../../app/routes.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/screen_header_image.dart';
 import 'settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -26,6 +27,8 @@ class ProfileScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          const ScreenHeaderImage(asset: 'assets/images/m0AAZ.jpg'),
+          const SizedBox(height: 20),
           // User info card
           Card(
             child: Padding(

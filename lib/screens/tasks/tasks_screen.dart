@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../models/task_model.dart';
 import '../../providers/task_provider.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/screen_header_image.dart';
 import 'add_task_screen.dart';
 import 'task_detail_screen.dart';
 
@@ -228,6 +229,10 @@ class _TasksScreenState extends State<TasksScreen> {
         onRefresh: _refreshTasks,
         child: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: ScreenHeaderImage(asset: 'assets/images/yXKYN.jpg'),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: TextField(

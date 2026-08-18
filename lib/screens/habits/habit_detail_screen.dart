@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_colors.dart';
 import '../../models/habit_model.dart';
 import '../../providers/habit_provider.dart';
+import '../../widgets/screen_header_image.dart';
 import 'add_habit_screen.dart';
 
 class HabitDetailScreen extends StatefulWidget {
@@ -90,6 +91,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
+            const ScreenHeaderImage(asset: 'assets/images/FyiXR.jpg'),
+            const SizedBox(height: 20),
             Text(
               widget.habit.name,
               style: Theme.of(

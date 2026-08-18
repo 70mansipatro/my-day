@@ -7,6 +7,7 @@ import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/screen_header_image.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -68,6 +69,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const ScreenHeaderImage(asset: 'assets/images/31sTr.jpg'),
+                const SizedBox(height: 24),
                 Text(
                   'MyDay',
                   style: Theme.of(context)

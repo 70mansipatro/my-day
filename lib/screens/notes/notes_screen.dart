@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/note_provider.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/note_card.dart';
+import '../../widgets/screen_header_image.dart';
 import 'add_note_screen.dart';
 import 'note_detail_screen.dart';
 
@@ -198,6 +199,10 @@ class _NotesScreenState extends State<NotesScreen> {
         onRefresh: _refreshNotes,
         child: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: ScreenHeaderImage(asset: 'assets/images/FJRyR.jpg'),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: TextField(

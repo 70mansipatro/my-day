@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/task_model.dart';
 import '../../providers/task_provider.dart';
+import '../../widgets/screen_header_image.dart';
 import 'edit_task_screen.dart';
 
 class TaskDetailScreen extends StatelessWidget {
@@ -70,6 +71,8 @@ class TaskDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const ScreenHeaderImage(asset: 'assets/images/m0AAZ.jpg'),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(

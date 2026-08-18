@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_colors.dart';
+import '../../widgets/screen_header_image.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -12,6 +13,8 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          const ScreenHeaderImage(asset: 'assets/images/aOpdG.jpg'),
+          const SizedBox(height: 20),
           Text(
             'App Settings',
             style: Theme.of(
@@ -113,10 +116,11 @@ class AboutScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          const ScreenHeaderImage(asset: 'assets/images/31sTr.jpg'),
           Center(
             child: Column(
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
                 Container(
                   width: 80,
                   height: 80,

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/task_model.dart';
 import '../../providers/task_provider.dart';
+import '../../widgets/screen_header_image.dart';
 
 class EditTaskScreen extends StatefulWidget {
   final TaskModel task;
@@ -101,6 +102,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             key: _formKey,
             child: Column(
               children: [
+                const ScreenHeaderImage(asset: 'assets/images/cc7r7.jpg'),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(labelText: 'Title'),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/habit_model.dart';
 import '../../providers/habit_provider.dart';
+import '../../widgets/screen_header_image.dart';
 import 'add_habit_screen.dart';
 import 'habit_detail_screen.dart';
 
@@ -257,6 +258,10 @@ class _HabitsScreenState extends State<HabitsScreen> {
         onRefresh: _refresh,
         child: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: ScreenHeaderImage(asset: 'assets/images/AsoxL.jpg'),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: TextField(
