@@ -12,4 +12,6 @@ class ApiConstants {
   static const String tasks = '/tasks';
   static const String notes = '/notes';
   static const String habits = '/habits';
+  static const String notifications = '/notifications';
+  static const String notificationPreferences = '/notification-preferences';
 }

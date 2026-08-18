@@ -7,6 +7,8 @@ const taskRoutes = require('./routes/taskRoutes');
 const noteRoutes = require('./routes/noteRoutes');
 const habitRoutes = require('./routes/habitRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const notificationPreferenceRoutes = require('./routes/notificationPreferenceRoutes');
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/habits', habitRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/notification-preferences', notificationPreferenceRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });

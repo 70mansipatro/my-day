@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../core/utils/responsive.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/dashboard_provider.dart';
+import '../../providers/notification_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../widgets/screen_header_image.dart';
 import '../habits/add_habit_screen.dart';
@@ -57,6 +58,22 @@ class _HomeScreenState extends State<HomeScreen> {
     HabitsScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notificationProvider = context.read<NotificationProvider>();
+      notificationProvider.refreshUnreadCount();
+      notificationProvider.startUnreadPolling();
+    });
+  }
+
+  @override
+  void dispose() {
+    context.read<NotificationProvider>().stopUnreadPolling();
+    super.dispose();
+  }
 
   Future<void> _handleLogout(BuildContext context) async {
     await context.read<AuthProvider>().logout();

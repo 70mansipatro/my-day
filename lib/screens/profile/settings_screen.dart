@@ -1,13 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/app_colors.dart';
+import '../../providers/notification_provider.dart';
 import '../../widgets/screen_header_image.dart';
+import '../notifications/notifications_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NotificationProvider>().loadPreferences();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final preferences = context.watch<NotificationProvider>().preferences;
+    final notificationSubtitle = preferences == null
+        ? 'Manage notification preferences'
+        : preferences.pushEnabled
+        ? 'Notifications enabled'
+        : 'Notifications disabled';
+
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
@@ -26,9 +49,11 @@ class SettingsScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.notifications_outlined),
               title: const Text('Notifications'),
-              subtitle: const Text('Manage notification preferences'),
+              subtitle: Text(notificationSubtitle),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => _showFeatureComingSoon(context),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -51,15 +76,6 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showFeatureComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('This feature is coming soon'),
-        duration: Duration(seconds: 2),
       ),
     );
   }
