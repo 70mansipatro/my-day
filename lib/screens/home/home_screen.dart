@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/utils/date_utils.dart';
+import '../../providers/habit_provider.dart';
 import '../../providers/note_provider.dart';
 import '../../providers/task_provider.dart';
 import '../habits/habits_screen.dart';
@@ -85,6 +86,7 @@ class _HomeTabState extends State<_HomeTab> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskProvider>().loadTasks();
       context.read<NoteProvider>().loadNotes();
+      context.read<HabitProvider>().loadTodayHabits();
     });
   }
 
@@ -92,6 +94,7 @@ class _HomeTabState extends State<_HomeTab> {
   Widget build(BuildContext context) {
     final taskProvider = context.watch<TaskProvider>();
     final noteProvider = context.watch<NoteProvider>();
+    final habitProvider = context.watch<HabitProvider>();
     final now = DateTime.now();
     final greeting = AppDateUtils.greetingForNow(now);
     final today = AppDateUtils.formatFullDate(now);
@@ -99,6 +102,8 @@ class _HomeTabState extends State<_HomeTab> {
     final completed = taskProvider.completedTasks;
     final pending = taskProvider.pendingTasks;
     final recentNotes = noteProvider.recentNotes;
+    final todayHabits = habitProvider.todayHabits;
+    final completedHabits = todayHabits.where((habit) => habit.isActive).length;
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -137,6 +142,56 @@ class _HomeTabState extends State<_HomeTab> {
           subtitle:
               '${taskProvider.completionRate.toStringAsFixed(0)}% complete',
         ),
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Today\'s Habits',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const HabitsScreen())),
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (todayHabits.isEmpty)
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.track_changes_outlined),
+              title: const Text('No habits scheduled for today'),
+              subtitle: const Text('Create your first habit'),
+            ),
+          )
+        else ...[
+          ...todayHabits
+              .take(3)
+              .map(
+                (habit) => Card(
+                  child: ListTile(
+                    leading: Icon(
+                      habit.isActive
+                          ? Icons.check_circle_outline
+                          : Icons.radio_button_unchecked,
+                      color: habit.isActive ? Colors.green : Colors.grey,
+                    ),
+                    title: Text(habit.name),
+                    subtitle: Text(
+                      habit.frequency == 'daily' ? 'Daily' : 'Weekly',
+                    ),
+                  ),
+                ),
+              ),
+          const SizedBox(height: 4),
+          Text(
+            'Completed: $completedHabits / ${todayHabits.length}',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

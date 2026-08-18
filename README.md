@@ -3,6 +3,114 @@
 MyDay is a full-stack personal productivity app for tracking tasks, notes,
 and habits. **Plan. Track. Grow.**
 
+This repository now includes **Phase 5: Habit Tracking**. The app supports
+secure, user-scoped habit creation, tracking, streak calculation, statistics,
+and home-screen summaries across the Flutter client and the Express + MongoDB backend.
+
+## Phase 5 - Habit Tracking
+
+### Habit Features
+
+- Create daily and weekly habits for the authenticated user only
+- View all habits, a single habit, and today's scheduled habits
+- Edit and deactivate or reactivate habits without losing history
+- Delete habits and remove their related habit logs safely
+- Toggle habit completion for the current day
+- Search by habit name and description
+- Filter by activity state, frequency, and category
+- Sort by newest, oldest, name, or streak
+- Review habit history and weekly completion stats
+- Calculate current streak, best streak, and completion rate
+
+### Daily and Weekly Habit Logic
+
+Daily habits are scheduled every day. A daily streak is the count of consecutive
+completed calendar days ending today. If today's completion is missing, the
+current daily streak resets to 0.
+
+Weekly habits only count scheduled target days. For a habit with target days
+Monday, Wednesday, and Friday, only those weekdays are considered when
+calculating streaks and completion rates. Tuesday or Thursday is never counted
+as a missed scheduled day unless it is part of the chosen target set.
+
+### Habit Logs and MongoDB Collections
+
+The backend uses two collections in MongoDB:
+
+- `habits` for habit metadata (`userId`, `name`, `description`, `category`,
+  `frequency`, `targetDays`, `isActive`, timestamps)
+- `habitLogs` for one completion record per habit per day
+
+The `habitLogs` collection uses a unique compound index on `habitId` + `date` to
+prevent duplicate logs for the same habit on the same calendar day.
+
+### Habit API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| GET | `/api/habits` | Yes | List habits for the logged-in user |
+| POST | `/api/habits` | Yes | Create a habit |
+| GET | `/api/habits/today` | Yes | Get habits scheduled for today |
+| GET | `/api/habits/:id` | Yes | Fetch one habit |
+| PUT | `/api/habits/:id` | Yes | Update a habit |
+| PATCH | `/api/habits/:id/toggle` | Yes | Toggle today's completion |
+| DELETE | `/api/habits/:id` | Yes | Remove a habit and its logs |
+| GET | `/api/habits/:id/history` | Yes | Get recent history |
+| GET | `/api/habits/:id/stats` | Yes | Get streak and completion stats |
+
+### Habit Model
+
+The backend uses a Mongoose `Habit` model in `backend/src/models/Habit.js` with:
+
+- `userId`: required `ObjectId` reference to `User`
+- `name`: required, trimmed, 1-100 characters
+- `description`: optional, trimmed, max 500 characters
+- `category`: optional, trimmed, max 50 characters, default `General`
+- `frequency`: `daily | weekly` with default `daily`
+- `targetDays`: array of weekdays 0-6 for weekly habits
+- `isActive`: boolean, default `true`
+- `createdAt` / `updatedAt`: managed automatically by Mongoose timestamps
+
+### Habit Log Model
+
+The backend uses a Mongoose `HabitLog` model in `backend/src/models/HabitLog.js`:
+
+- `userId`: required `ObjectId` reference to `User`
+- `habitId`: required `ObjectId` reference to `Habit`
+- `date`: normalized to the start of the day in UTC
+- `completed`: boolean, default `true`
+- `createdAt` / `updatedAt`: managed automatically by Mongoose timestamps
+
+### Flutter Screens
+
+- Habits list screen with search, filters, and sorting
+- Add/edit habit screen with weekly weekday selector
+- Habit detail screen with stats and history
+- Home screen summary card for today's habits
+
+### Testing Instructions
+
+Backend:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Flutter:
+
+```bash
+flutter pub get
+flutter run
+```
+
+For Android emulator testing, the app uses `10.0.2.2` to reach the host API.
+
+This project intentionally keeps the backend and frontend responsibilities
+separate while using the same secure JWT authentication flow.
+
+
 This repository includes **Phase 4: Notes Management**. The app now supports
 secure, user-scoped note CRUD, searching, filtering, sorting, favorites, and
 home-screen summaries across the Flutter client and the Express + MongoDB backend.
