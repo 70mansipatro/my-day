@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'responsive_hero_image.dart';
+
 /// Rounded banner image shown at the top of a screen for visual flavor.
+///
+/// Thin wrapper around [ResponsiveHeroImage] so every existing call site
+/// gets responsive sizing, bottom-gradient blending, and a graceful
+/// fallback without having to change its call sites.
 class ScreenHeaderImage extends StatelessWidget {
   const ScreenHeaderImage({super.key, required this.asset, this.height = 150});
 
@@ -9,14 +15,11 @@ class ScreenHeaderImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.asset(
-        asset,
-        height: height,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
+    return ResponsiveHeroImage(
+      imagePath: asset,
+      mobileHeight: height,
+      tabletHeight: height + 60,
+      desktopHeight: height + 140,
     );
   }
 }

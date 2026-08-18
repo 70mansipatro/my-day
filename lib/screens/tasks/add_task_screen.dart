@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/task_provider.dart';
-import '../../widgets/screen_header_image.dart';
+import '../../widgets/full_visible_hero_image.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({super.key});
@@ -79,95 +79,111 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const ScreenHeaderImage(asset: 'assets/images/FJRyR.jpg'),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(labelText: 'Title'),
-                  validator: (value) {
-                    if ((value ?? '').trim().isEmpty) {
-                      return 'Title is required';
-                    }
-                    if (value!.trim().length > 150) {
-                      return 'Title must be 150 characters or fewer';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 4,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  validator: (value) {
-                    if ((value ?? '').trim().length > 1000) {
-                      return 'Description must be 1000 characters or fewer';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: _priority,
-                  items: const [
-                    DropdownMenuItem(value: 'low', child: Text('Low')),
-                    DropdownMenuItem(value: 'medium', child: Text('Medium')),
-                    DropdownMenuItem(value: 'high', child: Text('High')),
-                  ],
-                  onChanged: (value) =>
-                      setState(() => _priority = value ?? 'medium'),
-                  decoration: const InputDecoration(labelText: 'Priority'),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _categoryController,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  validator: (value) {
-                    if ((value ?? '').trim().length > 50) {
-                      return 'Category must be 50 characters or fewer';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                InkWell(
-                  onTap: _pickDueDate,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(labelText: 'Due Date'),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _dueDate == null
-                              ? 'Select date'
-                              : DateFormat('MMM d, yyyy').format(_dueDate!),
-                        ),
-                        const Icon(Icons.calendar_today_outlined),
-                      ],
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const FullVisibleHeroImage(
+                      imagePath: 'assets/images/FJRyR.jpg',
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(labelText: 'Title'),
+                      validator: (value) {
+                        if ((value ?? '').trim().isEmpty) {
+                          return 'Title is required';
+                        }
+                        if (value!.trim().length > 150) {
+                          return 'Title must be 150 characters or fewer';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                      ),
+                      validator: (value) {
+                        if ((value ?? '').trim().length > 1000) {
+                          return 'Description must be 1000 characters or fewer';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      initialValue: _priority,
+                      items: const [
+                        DropdownMenuItem(value: 'low', child: Text('Low')),
+                        DropdownMenuItem(
+                          value: 'medium',
+                          child: Text('Medium'),
+                        ),
+                        DropdownMenuItem(value: 'high', child: Text('High')),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => _priority = value ?? 'medium'),
+                      decoration: const InputDecoration(labelText: 'Priority'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _categoryController,
+                      decoration: const InputDecoration(labelText: 'Category'),
+                      validator: (value) {
+                        if ((value ?? '').trim().length > 50) {
+                          return 'Category must be 50 characters or fewer';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    InkWell(
+                      onTap: _pickDueDate,
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Due Date',
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _dueDate == null
+                                  ? 'Select date'
+                                  : DateFormat('MMM d, yyyy').format(_dueDate!),
+                            ),
+                            const Icon(Icons.calendar_today_outlined),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: isSaving ? null : _submit,
+                        icon: isSaving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.save_outlined),
+                        label: Text(isSaving ? 'Saving...' : 'Save Task'),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 28),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: isSaving ? null : _submit,
-                    icon: isSaving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.save_outlined),
-                    label: Text(isSaving ? 'Saving...' : 'Save Task'),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

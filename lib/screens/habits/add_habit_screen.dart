@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/habit_model.dart';
 import '../../providers/habit_provider.dart';
-import '../../widgets/screen_header_image.dart';
+import '../../widgets/full_visible_hero_image.dart';
 
 class AddHabitScreen extends StatefulWidget {
   final HabitModel? habit;
@@ -122,126 +122,142 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const ScreenHeaderImage(asset: 'assets/images/Bz5Wj.jpg'),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Habit name'),
-                  validator: (value) {
-                    if ((value ?? '').trim().isEmpty) {
-                      return 'Habit name is required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  validator: (value) {
-                    if ((value ?? '').trim().length > 500) {
-                      return 'Description must be 500 characters or fewer';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _categoryController,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  validator: (value) {
-                    if ((value ?? '').trim().length > 50) {
-                      return 'Category must be 50 characters or fewer';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: _frequency,
-                  onChanged: (value) =>
-                      setState(() => _frequency = value ?? 'daily'),
-                  items: const [
-                    DropdownMenuItem(value: 'daily', child: Text('Daily')),
-                    DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
-                  ],
-                  decoration: const InputDecoration(labelText: 'Frequency'),
-                ),
-                const SizedBox(height: 16),
-                if (_frequency == 'weekly') ...[
-                  const Text(
-                    'Target Days',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children:
-                        const [
-                          'Sun',
-                          'Mon',
-                          'Tue',
-                          'Wed',
-                          'Thu',
-                          'Fri',
-                          'Sat',
-                        ].asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final label = entry.value;
-                          final selected = _targetDays.contains(index);
-                          return FilterChip(
-                            label: Text(label),
-                            selected: selected,
-                            onSelected: (_) {
-                              setState(() {
-                                if (selected) {
-                                  _targetDays.remove(index);
-                                } else {
-                                  _targetDays.add(index);
-                                  _targetDays.sort();
-                                }
-                              });
-                            },
-                          );
-                        }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                SwitchListTile(
-                  value: _isActive,
-                  onChanged: (value) => setState(() => _isActive = value),
-                  title: const Text('Active habit'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: isSaving ? null : _submit,
-                    icon: isSaving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.save_outlined),
-                    label: Text(
-                      isSaving
-                          ? 'Saving...'
-                          : widget.habit == null
-                          ? 'Save Habit'
-                          : 'Update Habit',
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const FullVisibleHeroImage(
+                      imagePath: 'assets/images/Bz5Wj.jpg',
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Habit name',
+                      ),
+                      validator: (value) {
+                        if ((value ?? '').trim().isEmpty) {
+                          return 'Habit name is required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                      ),
+                      validator: (value) {
+                        if ((value ?? '').trim().length > 500) {
+                          return 'Description must be 500 characters or fewer';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _categoryController,
+                      decoration: const InputDecoration(labelText: 'Category'),
+                      validator: (value) {
+                        if ((value ?? '').trim().length > 50) {
+                          return 'Category must be 50 characters or fewer';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      initialValue: _frequency,
+                      onChanged: (value) =>
+                          setState(() => _frequency = value ?? 'daily'),
+                      items: const [
+                        DropdownMenuItem(value: 'daily', child: Text('Daily')),
+                        DropdownMenuItem(
+                          value: 'weekly',
+                          child: Text('Weekly'),
+                        ),
+                      ],
+                      decoration: const InputDecoration(labelText: 'Frequency'),
+                    ),
+                    const SizedBox(height: 16),
+                    if (_frequency == 'weekly') ...[
+                      const Text(
+                        'Target Days',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children:
+                            const [
+                              'Sun',
+                              'Mon',
+                              'Tue',
+                              'Wed',
+                              'Thu',
+                              'Fri',
+                              'Sat',
+                            ].asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final label = entry.value;
+                              final selected = _targetDays.contains(index);
+                              return FilterChip(
+                                label: Text(label),
+                                selected: selected,
+                                onSelected: (_) {
+                                  setState(() {
+                                    if (selected) {
+                                      _targetDays.remove(index);
+                                    } else {
+                                      _targetDays.add(index);
+                                      _targetDays.sort();
+                                    }
+                                  });
+                                },
+                              );
+                            }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    SwitchListTile(
+                      value: _isActive,
+                      onChanged: (value) => setState(() => _isActive = value),
+                      title: const Text('Active habit'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: isSaving ? null : _submit,
+                        icon: isSaving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.save_outlined),
+                        label: Text(
+                          isSaving
+                              ? 'Saving...'
+                              : widget.habit == null
+                              ? 'Save Habit'
+                              : 'Update Habit',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

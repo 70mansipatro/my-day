@@ -4,7 +4,7 @@
 /// "localhost" on the host machine. Update [baseUrl] when pointing at a
 /// physical device, a LAN IP, or a deployed production server.
 class ApiConstants {
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  static const String baseUrl = 'http://localhost:5000/api';
 
   static const String health = '/health';
   static const String auth = '/auth';

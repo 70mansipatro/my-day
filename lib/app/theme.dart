@@ -73,13 +73,17 @@ class AppTheme {
 
   static ThemeData _buildTheme(ColorScheme scheme) {
     final isDark = scheme.brightness == Brightness.dark;
-    final Color scaffoldBg = isDark ? AppColors.darkBackground : AppColors.peach50;
+    final Color scaffoldBg = isDark
+        ? AppColors.darkBackground
+        : AppColors.peach50;
     final Color cardBg = scheme.surface;
     final Color borderColor = scheme.outline;
     final Color mutedText = scheme.onSurfaceVariant;
     final Color disabledBg = isDark ? AppColors.darkBorder : AppColors.gray200;
     final Color disabledFg = AppColors.gray400;
-    final Color unselectedControl = isDark ? AppColors.darkSecondaryText : AppColors.gray400;
+    final Color unselectedControl = isDark
+        ? AppColors.darkSecondaryText
+        : AppColors.gray400;
 
     return ThemeData(
       useMaterial3: true,
@@ -114,7 +118,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? AppColors.darkSurface : AppColors.peach50,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_controlRadius),
           borderSide: BorderSide(color: borderColor),
@@ -144,7 +151,9 @@ class AppTheme {
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(Size.fromHeight(50)),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(_controlRadius)),
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_controlRadius),
+            ),
           ),
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) return disabledBg;
@@ -162,7 +171,9 @@ class AppTheme {
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(Size.fromHeight(50)),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(_controlRadius)),
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_controlRadius),
+            ),
           ),
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) return disabledBg;
@@ -180,10 +191,14 @@ class AppTheme {
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(Size.fromHeight(50)),
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(_controlRadius)),
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(_controlRadius),
+            ),
           ),
           side: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.disabled)) return BorderSide(color: borderColor);
+            if (states.contains(WidgetState.disabled)) {
+              return BorderSide(color: borderColor);
+            }
             return const BorderSide(color: AppColors.peach500);
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
@@ -210,11 +225,15 @@ class AppTheme {
 
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: cardBg,
-        indicatorColor: isDark ? AppColors.darkPrimaryContainer : AppColors.peach100,
+        indicatorColor: isDark
+            ? AppColors.darkPrimaryContainer
+            : AppColors.peach100,
         surfaceTintColor: Colors.transparent,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return IconThemeData(color: selected ? AppColors.gray800 : unselectedControl);
+          return IconThemeData(
+            color: selected ? AppColors.peach900 : unselectedControl,
+          );
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
@@ -261,7 +280,9 @@ class AppTheme {
       ),
 
       chipTheme: ChipThemeData(
-        backgroundColor: isDark ? AppColors.darkSurface : const Color(0xFFF5F5F5),
+        backgroundColor: isDark
+            ? AppColors.darkSurface
+            : const Color(0xFFF5F5F5),
         selectedColor: AppColors.peach200,
         disabledColor: disabledBg,
         labelStyle: TextStyle(color: scheme.onSurface),
@@ -283,14 +304,18 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: cardBg,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_dialogRadius)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_dialogRadius),
+        ),
       ),
 
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: cardBg,
         surfaceTintColor: Colors.transparent,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(_dialogRadius)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(_dialogRadius),
+          ),
         ),
       ),
 
@@ -299,7 +324,9 @@ class AppTheme {
         contentTextStyle: const TextStyle(color: AppColors.white),
         actionTextColor: AppColors.peach300,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_controlRadius)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_controlRadius),
+        ),
       ),
 
       datePickerTheme: DatePickerThemeData(

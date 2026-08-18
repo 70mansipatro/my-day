@@ -1,74 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_colors.dart';
-
-/// Summary card for dashboard
-class DashboardSummaryCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color? iconColor;
-  final VoidCallback? onTap;
-
-  const DashboardSummaryCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    this.iconColor,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: (iconColor ?? AppColors.peach900).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: iconColor ?? AppColors.peach900, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.gray600,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            if (onTap != null)
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: onTap,
-                iconSize: 20,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import '../../models/task_model.dart';
 
 /// Task progress card
 class TaskProgressCard extends StatelessWidget {
@@ -294,9 +227,9 @@ class NotesSummaryCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '$favorites Favorites',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.gray600,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: AppColors.gray600),
                     ),
                   ],
                 ),
@@ -475,12 +408,20 @@ class QuickActionsRow extends StatelessWidget {
     required this.onAddHabit,
   });
 
+  static ButtonStyle get _style => OutlinedButton.styleFrom(
+    side: const BorderSide(color: AppColors.peach500),
+    foregroundColor: AppColors.peach900,
+    backgroundColor: Colors.transparent,
+    overlayColor: AppColors.peach100,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: OutlinedButton.icon(
+            style: _style,
             icon: const Icon(Icons.add),
             label: const Text('Task'),
             onPressed: onAddTask,
@@ -489,6 +430,7 @@ class QuickActionsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: OutlinedButton.icon(
+            style: _style,
             icon: const Icon(Icons.add),
             label: const Text('Note'),
             onPressed: onAddNote,
@@ -497,12 +439,119 @@ class QuickActionsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: OutlinedButton.icon(
+            style: _style,
             icon: const Icon(Icons.add),
             label: const Text('Habit'),
             onPressed: onAddHabit,
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Today's top tasks list — real data from [TaskProvider], filtered by the
+/// caller to tasks due today.
+class TodayTasksCard extends StatelessWidget {
+  final List<TaskModel> tasks;
+  final ValueChanged<String> onToggle;
+  final VoidCallback onCreateTask;
+
+  const TodayTasksCard({
+    super.key,
+    required this.tasks,
+    required this.onToggle,
+    required this.onCreateTask,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Today's Top Tasks",
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            if (tasks.isEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                'No tasks for today',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.peach500),
+                  foregroundColor: AppColors.peach900,
+                  overlayColor: AppColors.peach100,
+                ),
+                onPressed: onCreateTask,
+                child: const Text('Create your first task'),
+              ),
+            ] else
+              ...tasks.take(5).map((task) {
+                return InkWell(
+                  onTap: () => onToggle(task.id),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        Icon(
+                          task.completed
+                              ? Icons.check_circle
+                              : Icons.radio_button_unchecked,
+                          color: task.completed
+                              ? Colors.green
+                              : AppColors.peach700,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                task.title,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      decoration: task.completed
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                      color: task.completed
+                                          ? AppColors.gray400
+                                          : null,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                [
+                                  task.priority,
+                                  if ((task.category ?? '').isNotEmpty)
+                                    task.category!,
+                                ].join(' • '),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppColors.gray600),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -528,11 +577,7 @@ class EmptyDashboardState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.dashboard_outlined,
-              size: 64,
-              color: AppColors.gray300,
-            ),
+            Icon(Icons.dashboard_outlined, size: 64, color: AppColors.gray300),
             const SizedBox(height: 16),
             Text(
               'Welcome to MyDay',
