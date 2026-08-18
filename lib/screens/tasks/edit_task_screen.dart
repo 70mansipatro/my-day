@@ -105,10 +105,12 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   controller: _titleController,
                   decoration: const InputDecoration(labelText: 'Title'),
                   validator: (value) {
-                    if ((value ?? '').trim().isEmpty)
+                    if ((value ?? '').trim().isEmpty) {
                       return 'Title is required';
-                    if (value!.trim().length > 150)
+                    }
+                    if (value!.trim().length > 150) {
                       return 'Title must be 150 characters or fewer';
+                    }
                     return null;
                   },
                 ),
@@ -118,14 +120,15 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   maxLines: 4,
                   decoration: const InputDecoration(labelText: 'Description'),
                   validator: (value) {
-                    if ((value ?? '').trim().length > 1000)
+                    if ((value ?? '').trim().length > 1000) {
                       return 'Description must be 1000 characters or fewer';
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _priority,
+                  initialValue: _priority,
                   items: const [
                     DropdownMenuItem(value: 'low', child: Text('Low')),
                     DropdownMenuItem(value: 'medium', child: Text('Medium')),
@@ -140,8 +143,9 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   controller: _categoryController,
                   decoration: const InputDecoration(labelText: 'Category'),
                   validator: (value) {
-                    if ((value ?? '').trim().length > 50)
+                    if ((value ?? '').trim().length > 50) {
                       return 'Category must be 50 characters or fewer';
+                    }
                     return null;
                   },
                 ),

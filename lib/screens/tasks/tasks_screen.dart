@@ -138,20 +138,25 @@ class _TasksScreenState extends State<TasksScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  ...['newest', 'oldest', 'dueDate', 'priority']
-                      .map(
-                        (option) => RadioListTile<String>(
-                          title: Text(_sortLabel(option)),
-                          value: option,
-                          groupValue: selected,
-                          onChanged: (value) {
-                            setSheetState(() => selected = value ?? 'newest');
-                            provider.sortTasks(value ?? 'newest');
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      )
-                      .toList(),
+                  RadioGroup<String>(
+                    groupValue: selected,
+                    onChanged: (value) {
+                      final nextValue = value ?? 'newest';
+                      setSheetState(() => selected = nextValue);
+                      provider.sortTasks(nextValue);
+                      Navigator.of(context).pop();
+                    },
+                    child: Column(
+                      children: ['newest', 'oldest', 'dueDate', 'priority']
+                          .map(
+                            (option) => RadioListTile<String>(
+                              title: Text(_sortLabel(option)),
+                              value: option,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
                 ],
               ),
             );
@@ -280,7 +285,8 @@ class _TasksScreenState extends State<TasksScreen> {
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: provider.tasks.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
                       itemBuilder: (_, index) =>
                           _TaskTile(task: provider.tasks[index]),
                     ),
@@ -289,10 +295,13 @@ class _TasksScreenState extends State<TasksScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => const AddTaskScreen()))
-              .then((_) => context.read<TaskProvider>().loadTasks());
+        onPressed: () async {
+          final taskProvider = context.read<TaskProvider>();
+          await Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const AddTaskScreen()));
+          if (!context.mounted) return;
+          await taskProvider.loadTasks();
         },
         child: const Icon(Icons.add),
       ),

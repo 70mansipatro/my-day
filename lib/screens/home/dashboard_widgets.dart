@@ -27,7 +27,7 @@ class DashboardSummaryCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (iconColor ?? Colors.blue).withOpacity(0.1),
+                color: (iconColor ?? Colors.blue).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor ?? Colors.blue, size: 28),
@@ -106,7 +106,7 @@ class TaskProgressCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -187,7 +187,7 @@ class HabitProgressCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -300,7 +300,7 @@ class NotesSummaryCard extends StatelessWidget {
                 ),
                 Icon(
                   Icons.favorite,
-                  color: Colors.red.withOpacity(0.6),
+                  color: Colors.red.withValues(alpha: 0.6),
                   size: 24,
                 ),
               ],
@@ -371,7 +371,7 @@ class WeeklyProgressCard extends StatelessWidget {
                       width: 30,
                       height: height,
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.7),
+                        color: Colors.blue.withValues(alpha: 0.7),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(4),
                         ),
@@ -419,7 +419,7 @@ class RecentActivityItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (iconColor ?? Colors.blue).withOpacity(0.1),
+              color: (iconColor ?? Colors.blue).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: iconColor ?? Colors.blue, size: 20),

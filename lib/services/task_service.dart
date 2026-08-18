@@ -33,15 +33,24 @@ class TaskService {
     DateTime? dueDate,
     String? category,
   }) async {
-    final body = await _apiClient.post(ApiConstants.tasks, {
+    final categoryValue = category?.trim();
+    final payload = <String, dynamic>{
       'title': title,
       'description': description ?? '',
       'priority': priority,
       'completed': completed,
-      if (dueDate != null) 'dueDate': dueDate.toIso8601String(),
-      if (category != null && category.trim().isNotEmpty)
-        'category': category.trim(),
-    }, requiresAuth: true);
+      'dueDate': dueDate?.toIso8601String(),
+      'category': categoryValue != null && categoryValue.isNotEmpty
+          ? categoryValue
+          : null,
+    };
+    payload.removeWhere((_, value) => value == null);
+
+    final body = await _apiClient.post(
+      ApiConstants.tasks,
+      payload,
+      requiresAuth: true,
+    );
 
     final data = body['data'] as Map<String, dynamic>? ?? const {};
     return TaskModel.fromJson(data['task'] as Map<String, dynamic>);
@@ -56,14 +65,18 @@ class TaskService {
     DateTime? dueDate,
     String? category,
   }) async {
+    final categoryValue = category?.trim();
     final payload = <String, dynamic>{
-      if (title != null) 'title': title,
-      if (description != null) 'description': description,
-      if (priority != null) 'priority': priority,
-      if (completed != null) 'completed': completed,
-      if (dueDate != null) 'dueDate': dueDate.toIso8601String(),
-      if (category != null) 'category': category,
+      'title': title,
+      'description': description,
+      'priority': priority,
+      'completed': completed,
+      'dueDate': dueDate?.toIso8601String(),
+      'category': categoryValue != null && categoryValue.isNotEmpty
+          ? categoryValue
+          : null,
     };
+    payload.removeWhere((_, value) => value == null);
 
     final body = await _apiClient.put(
       '${ApiConstants.tasks}/$id',

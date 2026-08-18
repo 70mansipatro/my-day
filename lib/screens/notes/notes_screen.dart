@@ -141,16 +141,23 @@ class _NotesScreenState extends State<NotesScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  ...['newest', 'oldest', 'favorite'].map(
-                    (option) => RadioListTile<String>(
-                      title: Text(_sortLabel(option)),
-                      value: option,
-                      groupValue: selected,
-                      onChanged: (value) {
-                        setSheetState(() => selected = value ?? 'newest');
-                        provider.sortNotes(value ?? 'newest');
-                        Navigator.of(context).pop();
-                      },
+                  RadioGroup<String>(
+                    groupValue: selected,
+                    onChanged: (value) {
+                      final nextValue = value ?? 'newest';
+                      setSheetState(() => selected = nextValue);
+                      provider.sortNotes(nextValue);
+                      Navigator.of(context).pop();
+                    },
+                    child: Column(
+                      children: ['newest', 'oldest', 'favorite']
+                          .map(
+                            (option) => RadioListTile<String>(
+                              title: Text(_sortLabel(option)),
+                              value: option,
+                            ),
+                          )
+                          .toList(),
                     ),
                   ),
                 ],

@@ -110,7 +110,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _priority,
+                  initialValue: _priority,
                   items: const [
                     DropdownMenuItem(value: 'low', child: Text('Low')),
                     DropdownMenuItem(value: 'medium', child: Text('Medium')),

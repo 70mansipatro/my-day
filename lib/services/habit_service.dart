@@ -63,15 +63,19 @@ class HabitService {
     bool? isActive,
   }) async {
     final payload = <String, dynamic>{
-      if (name != null) 'name': name,
-      if (description != null) 'description': description,
-      if (category != null) 'category': category,
-      if (frequency != null) 'frequency': frequency,
-      if (targetDays != null) 'targetDays': targetDays,
-      if (isActive != null) 'isActive': isActive,
-    };
+      'name': name,
+      'description': description,
+      'category': category,
+      'frequency': frequency,
+      'targetDays': targetDays,
+      'isActive': isActive,
+    }..removeWhere((_, value) => value == null);
 
-    final body = await _apiClient.put('/habits/$id', payload, requiresAuth: true);
+    final body = await _apiClient.put(
+      '/habits/$id',
+      payload,
+      requiresAuth: true,
+    );
     final data = body['data'] as Map<String, dynamic>? ?? const {};
     return HabitModel.fromJson(data['habit'] as Map<String, dynamic>);
   }
@@ -81,13 +85,23 @@ class HabitService {
   }
 
   Future<HabitModel> toggleHabitToday(String id) async {
-    final body = await _apiClient.patch('/habits/$id/toggle', const {}, requiresAuth: true);
+    final body = await _apiClient.patch(
+      '/habits/$id/toggle',
+      const {},
+      requiresAuth: true,
+    );
     final data = body['data'] as Map<String, dynamic>? ?? const {};
     return HabitModel.fromJson(data['habit'] as Map<String, dynamic>);
   }
 
-  Future<List<HabitLogModel>> getHabitHistory(String id, {int days = 30}) async {
-    final body = await _apiClient.get('/habits/$id/history?days=$days', requiresAuth: true);
+  Future<List<HabitLogModel>> getHabitHistory(
+    String id, {
+    int days = 30,
+  }) async {
+    final body = await _apiClient.get(
+      '/habits/$id/history?days=$days',
+      requiresAuth: true,
+    );
     final data = body['data'] as Map<String, dynamic>? ?? const {};
     final history = data['history'] as List<dynamic>? ?? const [];
     return history

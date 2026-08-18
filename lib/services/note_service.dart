@@ -55,11 +55,11 @@ class NoteService {
     bool? isFavorite,
   }) async {
     final payload = <String, dynamic>{
-      if (title != null) 'title': title,
-      if (content != null) 'content': content,
-      if (category != null) 'category': category,
-      if (isFavorite != null) 'isFavorite': isFavorite,
-    };
+      'title': title,
+      'content': content,
+      'category': category,
+      'isFavorite': isFavorite,
+    }..removeWhere((_, value) => value == null);
 
     final body = await _apiClient.put(
       '${ApiConstants.notes}/$id',
