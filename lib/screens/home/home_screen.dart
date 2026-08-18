@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/utils/date_utils.dart';
-import '../../providers/habit_provider.dart';
-import '../../providers/note_provider.dart';
-import '../../providers/task_provider.dart';
+import '../../providers/dashboard_provider.dart';
+import '../../services/dashboard_service.dart';
 import '../habits/habits_screen.dart';
 import '../notes/notes_screen.dart';
 import '../profile/profile_screen.dart';
 import '../tasks/tasks_screen.dart';
+import 'dashboard_widgets.dart';
 
 /// Hosts the bottom navigation shell shared by Home, Tasks, Notes, Habits
 /// and Profile.
@@ -84,177 +83,233 @@ class _HomeTabState extends State<_HomeTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TaskProvider>().loadTasks();
-      context.read<NoteProvider>().loadNotes();
-      context.read<HabitProvider>().loadTodayHabits();
+      context.read<DashboardProvider>().loadDashboard();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final taskProvider = context.watch<TaskProvider>();
-    final noteProvider = context.watch<NoteProvider>();
-    final habitProvider = context.watch<HabitProvider>();
-    final now = DateTime.now();
-    final greeting = AppDateUtils.greetingForNow(now);
-    final today = AppDateUtils.formatFullDate(now);
-    final total = taskProvider.totalTasks;
-    final completed = taskProvider.completedTasks;
-    final pending = taskProvider.pendingTasks;
-    final recentNotes = noteProvider.recentNotes;
-    final todayHabits = habitProvider.todayHabits;
-    final completedHabits = todayHabits.where((habit) => habit.isActive).length;
+    final dashboardProvider = context.watch<DashboardProvider>();
+    final dashboard = dashboardProvider.dashboard;
+    final isLoading = dashboardProvider.isLoading;
+    final isRefreshing = dashboardProvider.isRefreshing;
+    final error = dashboardProvider.errorMessage;
 
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text(
-          greeting,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          today,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
-        ),
-        const SizedBox(height: 24),
-        _SummaryCard(
-          icon: Icons.check_circle_outline,
-          title: "Today's Tasks",
-          subtitle: total == 0
-              ? 'No tasks yet'
-              : '$completed of $total completed',
-        ),
-        const SizedBox(height: 12),
-        _SummaryCard(
-          icon: Icons.fact_check_outlined,
-          title: 'Total Tasks',
-          subtitle: '$total total • $pending pending',
-        ),
-        const SizedBox(height: 12),
-        _SummaryCard(
-          icon: Icons.note_outlined,
-          title: 'Task Completion',
-          subtitle:
-              '${taskProvider.completionRate.toStringAsFixed(0)}% complete',
-        ),
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // Show loading state
+    if (isLoading && dashboard == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Show error state
+    if (error != null && dashboard == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Today\'s Habits',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            Icon(Icons.error_outline, size: 64, color: Colors.grey.shade400),
+            const SizedBox(height: 16),
+            Text(
+              'Unable to load dashboard',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            TextButton(
-              onPressed: () => Navigator.of(
+            const SizedBox(height: 8),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: Theme.of(
                 context,
-              ).push(MaterialPageRoute(builder: (_) => const HabitsScreen())),
-              child: const Text('View All'),
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () =>
+                  context.read<DashboardProvider>().loadDashboard(),
+              child: const Text('Retry'),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        if (todayHabits.isEmpty)
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.track_changes_outlined),
-              title: const Text('No habits scheduled for today'),
-              subtitle: const Text('Create your first habit'),
-            ),
-          )
-        else ...[
-          ...todayHabits
-              .take(3)
-              .map(
-                (habit) => Card(
-                  child: ListTile(
-                    leading: Icon(
-                      habit.isActive
-                          ? Icons.check_circle_outline
-                          : Icons.radio_button_unchecked,
-                      color: habit.isActive ? Colors.green : Colors.grey,
-                    ),
-                    title: Text(habit.name),
-                    subtitle: Text(
-                      habit.frequency == 'daily' ? 'Daily' : 'Weekly',
-                    ),
-                  ),
-                ),
-              ),
+      );
+    }
+
+    // No data state
+    if (dashboard == null) {
+      return EmptyDashboardState(
+        onAddTask: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const TasksScreen())),
+        onAddNote: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const NotesScreen())),
+        onAddHabit: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const HabitsScreen())),
+      );
+    }
+
+    // Check if dashboard is empty (no data)
+    final isEmpty =
+        dashboard.tasks.total == 0 &&
+        dashboard.notes.total == 0 &&
+        dashboard.habits.total == 0;
+
+    if (isEmpty) {
+      return EmptyDashboardState(
+        onAddTask: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const TasksScreen())),
+        onAddNote: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const NotesScreen())),
+        onAddHabit: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const HabitsScreen())),
+      );
+    }
+
+    // Build weekly progress data
+    final weeklyData = dashboard.weeklyProgress
+        .map(
+          (item) => (
+            day: item.day,
+            value: item.tasksCompleted + item.habitsCompleted,
+          ),
+        )
+        .toList();
+
+    // Render dashboard
+    return RefreshIndicator(
+      onRefresh: () => context.read<DashboardProvider>().refreshDashboard(),
+      child: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          // Greeting and date
+          Text(
+            dashboard.greeting,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 4),
           Text(
-            'Completed: $completedHabits / ${todayHabits.length}',
-            style: Theme.of(context).textTheme.bodyMedium,
+            dashboard.date,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
           ),
-        ],
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Recent Notes',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(
+          const SizedBox(height: 24),
+
+          // Today's overview card
+          DashboardSummaryCard(
+            icon: Icons.today_outlined,
+            title: "Today's Overview",
+            subtitle:
+                'Tasks: ${dashboard.todayTasks.completed}/${dashboard.todayTasks.total} • Habits: ${dashboard.habits.completedToday}/${dashboard.habits.total}',
+            iconColor: Colors.blue,
+          ),
+          const SizedBox(height: 16),
+
+          // Task progress card
+          TaskProgressCard(
+            completed: dashboard.tasks.completed,
+            total: dashboard.tasks.total,
+            completionRate: dashboard.tasks.completionRate,
+            onViewTapped: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const TasksScreen())),
+          ),
+          const SizedBox(height: 16),
+
+          // Habit progress card
+          HabitProgressCard(
+            completed: dashboard.habits.completedToday,
+            total: dashboard.habits.total,
+            completionRate: dashboard.habits.completionRate,
+            bestStreak: dashboard.streaks.bestCurrentStreak,
+            onViewTapped: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const HabitsScreen())),
+          ),
+          const SizedBox(height: 16),
+
+          // Notes card
+          NotesSummaryCard(
+            total: dashboard.notes.total,
+            favorites: dashboard.notes.favorites,
+            onViewTapped: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const NotesScreen())),
+          ),
+          const SizedBox(height: 16),
+
+          // Weekly progress
+          WeeklyProgressCard(data: weeklyData),
+          const SizedBox(height: 16),
+
+          // Quick actions
+          QuickActionsRow(
+            onAddTask: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const TasksScreen())),
+            onAddNote: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const NotesScreen())),
+            onAddHabit: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const HabitsScreen())),
+          ),
+
+          // Recent activity section (if any)
+          if (dashboard.recentTasks.isNotEmpty ||
+              dashboard.recentNotes.isNotEmpty)
+            const SizedBox(height: 24),
+          if (dashboard.recentTasks.isNotEmpty ||
+              dashboard.recentNotes.isNotEmpty)
+            Text(
+              'Recent Activity',
+              style: Theme.of(
                 context,
-              ).push(MaterialPageRoute(builder: (_) => const NotesScreen())),
-              child: const Text('View All'),
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        if (recentNotes.isEmpty)
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.note_alt_outlined),
-              title: const Text('No notes yet'),
-              subtitle: const Text('Create your first note'),
-            ),
-          )
-        else
-          ...recentNotes.map(
-            (note) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Card(
-                child: ListTile(
-                  title: Text(note.title),
-                  subtitle: Text(note.category),
-                  trailing: note.isFavorite
-                      ? const Icon(Icons.star, color: Colors.amber)
-                      : null,
+          if (dashboard.recentTasks.isNotEmpty) const SizedBox(height: 12),
+          if (dashboard.recentTasks.isNotEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: dashboard.recentTasks.take(3).map((task) {
+                    return RecentActivityItem(
+                      icon: task.completed
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      title: 'Task: ${task.title}',
+                      description:
+                          '${task.completed ? 'Completed' : 'Pending'} • ${task.priority}',
+                      iconColor: task.completed ? Colors.green : Colors.orange,
+                    );
+                  }).toList(),
                 ),
               ),
             ),
-          ),
-      ],
-    );
-  }
-}
+          if (dashboard.recentNotes.isNotEmpty) const SizedBox(height: 12),
+          if (dashboard.recentNotes.isNotEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: dashboard.recentNotes.take(3).map((note) {
+                    return RecentActivityItem(
+                      icon: Icons.note_outlined,
+                      title: 'Note: ${note.title}',
+                      description: note.category,
+                      iconColor: note.isFavorite ? Colors.red : Colors.blue,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
 
-class _SummaryCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _SummaryCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(child: Icon(icon)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }

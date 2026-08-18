@@ -5,10 +5,12 @@ import 'app/app.dart';
 import 'core/network/api_client.dart';
 import 'core/storage/secure_storage_service.dart';
 import 'providers/auth_provider.dart';
+import 'providers/dashboard_provider.dart';
 import 'providers/habit_provider.dart';
 import 'providers/note_provider.dart';
 import 'providers/task_provider.dart';
 import 'services/auth_service.dart';
+import 'services/dashboard_service.dart';
 import 'services/habit_service.dart';
 import 'services/note_service.dart';
 import 'services/task_service.dart';
@@ -22,6 +24,9 @@ void main() {
   final taskProvider = TaskProvider(taskService: TaskService(apiClient));
   final noteProvider = NoteProvider(noteService: NoteService(apiClient));
   final habitProvider = HabitProvider(habitService: HabitService(apiClient));
+  final dashboardProvider = DashboardProvider(
+    dashboardService: DashboardService(apiClient),
+  );
   apiClient.onUnauthorized = authProvider.handleUnauthorized;
 
   runApp(
@@ -31,6 +36,7 @@ void main() {
         ChangeNotifierProvider.value(value: taskProvider),
         ChangeNotifierProvider.value(value: noteProvider),
         ChangeNotifierProvider.value(value: habitProvider),
+        ChangeNotifierProvider.value(value: dashboardProvider),
       ],
       child: const MyDayApp(),
     ),

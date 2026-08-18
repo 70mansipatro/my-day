@@ -8,6 +8,7 @@ class ApiConstants {
 
   static const String health = '/health';
   static const String auth = '/auth';
+  static const String dashboard = '/dashboard';
   static const String tasks = '/tasks';
   static const String notes = '/notes';
   static const String habits = '/habits';

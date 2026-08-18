@@ -818,3 +818,370 @@ my_day/
 - [x] `.env` is gitignored and was never committed
 - [x] JWT stored in `flutter_secure_storage`, never SharedPreferences, never
       logged or shown in the UI
+
+## Phase 6 - Dashboard + Progress + App Polish
+
+### Overview
+
+Phase 6 completes the MyDay app with a comprehensive dashboard that aggregates
+all user data (tasks, notes, habits, logs) into a single, unified view. No new
+data collections are created; all dashboard information is calculated dynamically
+from existing MongoDB documents.
+
+### Dashboard Endpoint
+
+**GET `/api/dashboard`**
+
+- **Auth Required:** Yes (JWT)
+- **User Scope:** Data is always filtered to `req.userId` from the JWT
+- **Response:** Aggregated task stats, note summary, habit stats, streaks, 
+  weekly progress, and recent activity
+
+#### Response Structure
+
+```json
+{
+  "success": true,
+  "data": {
+    "greeting": "Good morning",
+    "date": "2026-08-18",
+    "tasks": {
+      "total": 10,
+      "completed": 6,
+      "pending": 4,
+      "completionRate": 60.0
+    },
+    "todayTasks": {
+      "total": 5,
+      "completed": 3,
+      "pending": 2
+    },
+    "notes": {
+      "total": 8,
+      "favorites": 3
+    },
+    "habits": {
+      "total": 5,
+      "completedToday": 3,
+      "pendingToday": 2,
+      "completionRate": 60.0
+    },
+    "streaks": {
+      "bestCurrentStreak": 12
+    },
+    "weeklyProgress": [
+      {
+        "date": "2026-08-12",
+        "day": "Mon",
+        "tasksCompleted": 2,
+        "habitsCompleted": 3
+      }
+      // ... 7 days total
+    ],
+    "recentTasks": [
+      {
+        "id": "...",
+        "title": "Complete Flutter project",
+        "completed": false,
+        "priority": "high",
+        "dueDate": "2026-08-20T00:00:00.000Z"
+      }
+      // ... up to 5 items
+    ],
+    "recentNotes": [
+      {
+        "id": "...",
+        "title": "...",
+        "category": "...",
+        "isFavorite": true,
+        "updatedAt": "..."
+      }
+      // ... up to 5 items
+    ],
+    "todayHabits": [
+      {
+        "id": "...",
+        "name": "Coding",
+        "category": "General",
+        "completedToday": true,
+        "currentStreak": 7
+      }
+      // ... scheduled for today
+    ]
+  }
+}
+```
+
+### Dashboard Features
+
+#### 1. Greeting and Date
+- Time-based greeting: "Good morning" (5-11:59), "Good afternoon" (12-16:59),
+  "Good evening" (17-20:59), "Good night" (21-04:59)
+- Today's date in `YYYY-MM-DD` format
+
+#### 2. Task Statistics
+- Total tasks, completed tasks, pending tasks, completion rate %
+- Today's task counts (tasks due today)
+
+#### 3. Notes Summary
+- Total notes, favorite notes count
+- Recent notes (up to 5, sorted by `updatedAt` descending)
+
+#### 4. Habit Statistics
+- Total active habits
+- Completed today, pending today (only counting scheduled habits)
+- Completion rate for today
+- Best current streak across all habits
+
+#### 5. Weekly Progress (Last 7 Days)
+- For each day: date, day name, tasks completed, habits completed
+- Uses existing `dueDate` for tasks and `habitLogs` for habit completion
+
+#### 6. Recent Activity
+- Recent tasks (up to 5)
+- Recent notes (up to 5)
+- No separate collection needed; uses existing timestamps
+
+### Database Queries
+
+All dashboard queries are user-scoped to `req.userId`:
+
+```javascript
+// Tasks
+Task.find({ userId, completed: { $in: [true, false] } })
+
+// Notes
+Note.find({ userId })
+
+// Active habits
+Habit.find({ userId, isActive: true })
+
+// Habit logs for the week
+HabitLog.find({ userId, date: { $gte: weekStart, $lt: today + 1 day } })
+```
+
+### Existing Indexes (Verified)
+
+**Task collection:**
+- `{ userId: 1, completed: 1 }` ✓
+- `{ userId: 1, dueDate: 1 }` ✓
+
+**Note collection:**
+- `{ userId: 1 }` ✓
+- `{ userId: 1, isFavorite: 1 }` ✓
+
+**Habit collection:**
+- `{ userId: 1, isActive: 1 }` ✓
+
+**HabitLog collection:**
+- `{ habitId: 1, date: 1 }` (unique) ✓
+- `{ userId: 1, date: 1 }` ✓
+
+### Flutter Dashboard Architecture
+
+#### Models (`lib/models/dashboard_model.dart`)
+- `DashboardModel`: Main response container
+- `TaskSummary`, `TodayTaskSummary`
+- `NoteSummary`, `HabitSummary`, `StreakSummary`
+- `WeeklyProgress`
+- `DashboardTask`, `DashboardNote`, `DashboardHabit`
+
+All models include `fromJson()` and `toJson()` for serialization.
+
+#### Service (`lib/services/dashboard_service.dart`)
+- `DashboardService.getDashboard()`: Calls `/api/dashboard` endpoint
+- Uses existing `ApiClient` with automatic JWT attachment
+
+#### Provider (`lib/providers/dashboard_provider.dart`)
+- `DashboardProvider`: Manages dashboard state
+- `dashboard`: Cached `DashboardModel`
+- `isLoading`, `isRefreshing`: Loading states
+- `loadDashboard()`: Initial load
+- `refreshDashboard()`: Pull-to-refresh
+- `errorMessage`: User-friendly error messages
+
+#### Widgets (`lib/screens/home/dashboard_widgets.dart`)
+- `DashboardSummaryCard`: Generic card for key metrics
+- `TaskProgressCard`: Tasks overview with progress bar
+- `HabitProgressCard`: Today's habits with streak display
+- `NotesSummaryCard`: Notes count and favorites
+- `WeeklyProgressCard`: 7-day bar chart visualization
+- `RecentActivityItem`: Activity list item
+- `QuickActionsRow`: Quick + Task/Note/Habit buttons
+- `EmptyDashboardState`: Welcome state when no data
+
+### Home Screen (Updated)
+
+**`lib/screens/home/home_screen.dart`**
+- Replaced manual task/note/habit loading with dashboard provider
+- Single `GET /api/dashboard` call instead of multiple API calls
+- Smooth `RefreshIndicator` for pull-to-refresh
+- Responsive card-based layout
+- Error and loading states
+
+### Profile Screen (Polished)
+
+**`lib/screens/profile/profile_screen.dart`**
+- User info in a card with avatar
+- Links to settings and about screens
+- Logout confirmation dialog
+- Professional Material 3 design
+
+### Settings & About Screens
+
+**`lib/screens/profile/settings_screen.dart`**
+- Notifications, Privacy & Security placeholders
+- About MyDay with version and build info
+- Features list
+- Privacy statement
+
+**`lib/screens/profile/about_screen.dart`**
+- App logo and name
+- Version and build information
+- Feature highlights
+- Privacy information
+
+### Weekly Progress Calculation
+
+For each of the last 7 days:
+1. Count tasks where `completed: true` and `dueDate` matches the day
+2. Count `habitLogs` where `completed: true` and `date` matches the day
+3. Return `{ date, day, tasksCompleted, habitsCompleted }`
+
+**Note:** Weekly task completion uses current `completed` state only. If the
+Task model doesn't store historical completion states, only the current state
+is visible.
+
+### Habit Scheduling in Dashboard
+
+- Only active habits (`isActive: true`) are included
+- Daily habits: always scheduled
+- Weekly habits: only if `targetDays` includes the current weekday
+- Pending today count: `scheduledToday: true && completedToday: false`
+
+### Performance Optimizations
+
+1. **Single Dashboard Endpoint**: One API call aggregates all data
+2. **Efficient Queries**: All queries are indexed on `userId`
+3. **No Extra Collections**: Uses existing Task, Note, Habit, HabitLog collections
+4. **Lean Queries**: Only essential fields returned
+5. **In-Memory Caching**: Provider caches dashboard in memory
+6. **Limited Results**: Recent items capped at 5 each
+
+### Error Handling
+
+**Backend:**
+- `401`: Invalid or expired JWT → `{ success: false, message: "Unauthorized" }`
+- `500`: Database error → `{ success: false, message: "Internal server error" }`
+
+**Flutter:**
+- Network errors: "Unable to connect to server. Check your internet connection."
+- 401 errors: Logged out automatically via `AuthProvider.handleUnauthorized`
+- Other errors: "Something went wrong. Please try again."
+
+### Testing Dashboard
+
+#### Backend Test
+
+```bash
+# Start server
+node backend/src/server.js
+
+# Make an authenticated request (requires valid JWT)
+curl -H "Authorization: Bearer <token>" http://localhost:5000/api/dashboard
+```
+
+Expected response: `{ success: true, data: { ... } }`
+
+#### User Isolation Test
+
+1. Create User A with tasks, notes, habits
+2. Create User B with different data
+3. Login User A → Dashboard shows only User A's data
+4. Login User B → Dashboard shows only User B's data
+5. Verify User A's data is never visible to User B
+
+#### Empty State Test
+
+- Login with new user → "Welcome to MyDay" screen
+- Create first task/note/habit → Dashboard updates
+- Quick action buttons navigate to correct screens
+
+### API Endpoint Structure
+
+```
+GET /api/dashboard
+  ├── Queries Task collection (userId-scoped)
+  ├── Queries Note collection (userId-scoped)
+  ├── Queries Habit collection (userId-scoped + isActive)
+  ├── Queries HabitLog collection (userId-scoped + date range)
+  ├── Calculates all statistics in-memory
+  └── Returns aggregated JSON response
+```
+
+### What Wasn't Created
+
+- **No new database collections** (e.g., no `dashboardStats` table)
+- **No external chart libraries** (uses simple Flutter widgets)
+- **No complex theme system** (uses existing Material 3 theme)
+- **No push notifications** (placeholder in settings only)
+- **No historical task tracking** (uses current `completed` state)
+- **No separate analytics engine** (all calculations done in-memory)
+
+### Files Created/Modified
+
+**Backend:**
+- ✓ `src/controllers/dashboardController.js` (new)
+- ✓ `src/routes/dashboardRoutes.js` (new)
+- ✓ `src/app.js` (modified - added dashboard routes)
+
+**Frontend:**
+- ✓ `lib/models/dashboard_model.dart` (new)
+- ✓ `lib/services/dashboard_service.dart` (new)
+- ✓ `lib/providers/dashboard_provider.dart` (new)
+- ✓ `lib/screens/home/dashboard_widgets.dart` (new)
+- ✓ `lib/screens/home/home_screen.dart` (modified)
+- ✓ `lib/screens/profile/profile_screen.dart` (modified)
+- ✓ `lib/screens/profile/settings_screen.dart` (new)
+- ✓ `lib/core/constants/api_constants.dart` (modified - added dashboard endpoint)
+- ✓ `lib/main.dart` (modified - added dashboard provider)
+
+### Phase 6 Completion Checklist
+
+- [x] Backend dashboard endpoint (`GET /api/dashboard`)
+- [x] JWT authentication required
+- [x] User-scoped data queries
+- [x] Task statistics calculation
+- [x] Today's task summary
+- [x] Notes summary with recent items
+- [x] Habit summary with completion tracking
+- [x] Streak calculation (using Phase 5 logic)
+- [x] Weekly progress (last 7 days)
+- [x] Recent activity section
+- [x] Flutter dashboard models
+- [x] Dashboard service with API integration
+- [x] Dashboard provider with state management
+- [x] Dashboard widgets (cards, progress, charts)
+- [x] Home screen transformed into dashboard
+- [x] Pull-to-refresh functionality
+- [x] Loading, error, and empty states
+- [x] Profile screen polished
+- [x] Settings screen created
+- [x] About screen created
+- [x] Responsive design
+- [x] No existing Phase 1-5 features broken
+- [x] Security: No cross-user data leaks
+- [x] Performance: Single API call for all dashboard data
+- [x] No new unnecessary database collections
+- [x] Indexes reviewed (all optimal)
+- [x] Error handling for network and auth errors
+
+### Next Steps (Phase 7+)
+
+- Push notifications
+- Advanced analytics and charts
+- Data export (CSV, PDF)
+- Integration with calendar apps
+- Dark mode toggle (UI-only, if theme doesn't exist)
+- Collaborative features (share habits, tasks)
+- Mobile app distribution

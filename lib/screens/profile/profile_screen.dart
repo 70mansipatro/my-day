@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
 import '../../providers/auth_provider.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -10,7 +11,9 @@ class ProfileScreen extends StatelessWidget {
   Future<void> _handleLogout(BuildContext context) async {
     await context.read<AuthProvider>().logout();
     if (!context.mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
   }
 
   @override
@@ -18,54 +21,112 @@ class ProfileScreen extends StatelessWidget {
     final user = context.watch<AuthProvider>().currentUser;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: const Text('Profile'), elevation: 0),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const CircleAvatar(
-            radius: 40,
-            child: Icon(Icons.person, size: 40),
-          ),
-          const SizedBox(height: 12),
-          Center(
-            child: Text(
-              user?.name ?? '',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          // User info card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.person, size: 40, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    user?.name ?? 'User',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user?.email ?? '',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          Center(child: Text(user?.email ?? '')),
-          const SizedBox(height: 32),
-          Text('Settings', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 24),
+
+          // Settings section
+          Text(
+            'Settings',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           Card(
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.notifications_outlined),
-                  title: const Text('Notifications'),
+                  leading: const Icon(Icons.settings_outlined),
+                  title: const Text('App Settings'),
+                  subtitle: const Text('Customize your experience'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
-                ),
-                ListTile(
-                  leading: const Icon(Icons.lock_outline),
-                  title: const Text('Privacy & Security'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  title: const Text('About MyDay'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          OutlinedButton.icon(
-            onPressed: () => _handleLogout(context),
-            icon: const Icon(Icons.logout),
-            label: const Text('Logout'),
+
+          // Account section
+          Text(
+            'Account',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.logout_outlined),
+              title: const Text('Logout'),
+              subtitle: const Text('Sign out from your account'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _showLogoutDialog(context),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _handleLogout(context);
+            },
+            child: const Text('Logout'),
           ),
         ],
       ),
