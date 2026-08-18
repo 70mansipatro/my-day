@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/app_colors.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -126,7 +128,7 @@ class AboutScreen extends StatelessWidget {
                     child: Icon(
                       Icons.today_outlined,
                       size: 50,
-                      color: Colors.white,
+                      color: AppColors.gray800,
                     ),
                   ),
                 ),
@@ -142,7 +144,7 @@ class AboutScreen extends StatelessWidget {
                   'Personal Productivity App',
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.gray600),
                 ),
               ],
             ),
@@ -205,7 +207,7 @@ class AboutScreen extends StatelessWidget {
                   Text(
                     'MyDay is a personal productivity app designed to help you manage your tasks, notes, and habits in one place. Stay organized, track your progress, and build better habits with MyDay.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade700,
+                      color: AppColors.gray600,
                       height: 1.6,
                     ),
                   ),
@@ -268,7 +270,7 @@ class AboutScreen extends StatelessWidget {
                   Text(
                     'Your data is encrypted and stored securely. We never share your personal information with third parties.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade700,
+                      color: AppColors.gray600,
                       height: 1.6,
                     ),
                   ),
@@ -296,7 +298,7 @@ class AboutScreen extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: Colors.green,
+              color: AppColors.peach900,
             ),
           ),
           const SizedBox(height: 4),
@@ -304,7 +306,7 @@ class AboutScreen extends StatelessWidget {
             description,
             style: Theme.of(
               context,
-            ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+            ).textTheme.bodySmall?.copyWith(color: AppColors.gray600),
           ),
         ],
       ),

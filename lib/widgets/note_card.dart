@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../app/app_colors.dart';
+
 /// A reusable card used to display a single note.
 class NoteCard extends StatelessWidget {
   final String title;
@@ -47,7 +49,7 @@ class NoteCard extends StatelessWidget {
                     ),
                   ),
                   if (isFavorite)
-                    const Icon(Icons.star, color: Colors.amber, size: 18),
+                    const Icon(Icons.star, color: AppColors.peach700, size: 18),
                 ],
               ),
               const SizedBox(height: 8),

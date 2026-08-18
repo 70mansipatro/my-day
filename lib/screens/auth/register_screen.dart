@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/app_colors.dart';
 import '../../app/routes.dart';
 import '../../core/utils/validators.dart';
 import '../../providers/auth_provider.dart';
@@ -80,7 +81,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
-                      ?.copyWith(color: Colors.grey.shade600),
+                      ?.copyWith(color: AppColors.gray600),
                 ),
                 const SizedBox(height: 32),
                 AppTextField(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/app_colors.dart';
 import '../../app/routes.dart';
 import '../../core/constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
@@ -50,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const Icon(
               Icons.check_circle_outline,
               size: 80,
-              color: Colors.white,
+              color: AppColors.gray800,
             ),
             const SizedBox(height: 16),
             Text(
@@ -58,16 +59,16 @@ class _SplashScreenState extends State<SplashScreen> {
               style: const TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColors.gray800,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               AppConstants.appTagline,
-              style: const TextStyle(fontSize: 16, color: Colors.white70),
+              style: const TextStyle(fontSize: 16, color: AppColors.gray600),
             ),
             const SizedBox(height: 32),
-            const CircularProgressIndicator(color: Colors.white),
+            const CircularProgressIndicator(color: AppColors.gray800),
           ],
         ),
       ),

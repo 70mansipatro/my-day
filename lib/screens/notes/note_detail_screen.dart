@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/app_colors.dart';
 import '../../models/note_model.dart';
 import '../../providers/note_provider.dart';
 import 'add_note_screen.dart';
@@ -91,7 +92,7 @@ class NoteDetailScreen extends StatelessWidget {
                           },
                     icon: Icon(
                       note.isFavorite ? Icons.star : Icons.star_border,
-                      color: note.isFavorite ? Colors.amber : null,
+                      color: note.isFavorite ? AppColors.peach700 : null,
                     ),
                   ),
                 ],

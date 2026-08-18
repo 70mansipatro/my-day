@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/app_colors.dart';
 import '../../providers/dashboard_provider.dart';
 import '../habits/habits_screen.dart';
 import '../notes/notes_screen.dart';
@@ -104,7 +105,7 @@ class _HomeTabState extends State<_HomeTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.grey.shade400),
+            Icon(Icons.error_outline, size: 64, color: AppColors.gray400),
             const SizedBox(height: 16),
             Text(
               'Unable to load dashboard',
@@ -116,7 +117,7 @@ class _HomeTabState extends State<_HomeTab> {
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.gray600),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -192,7 +193,7 @@ class _HomeTabState extends State<_HomeTab> {
             dashboard.date,
             style: Theme.of(
               context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.gray600),
           ),
           const SizedBox(height: 24),
 
@@ -202,7 +203,7 @@ class _HomeTabState extends State<_HomeTab> {
             title: "Today's Overview",
             subtitle:
                 'Tasks: ${dashboard.todayTasks.completed}/${dashboard.todayTasks.total} • Habits: ${dashboard.habits.completedToday}/${dashboard.habits.total}',
-            iconColor: Colors.blue,
+            iconColor: AppColors.peach900,
           ),
           const SizedBox(height: 16),
 
@@ -282,7 +283,7 @@ class _HomeTabState extends State<_HomeTab> {
                       title: 'Task: ${task.title}',
                       description:
                           '${task.completed ? 'Completed' : 'Pending'} • ${task.priority}',
-                      iconColor: task.completed ? Colors.green : Colors.orange,
+                      iconColor: task.completed ? Colors.green : AppColors.peach700,
                     );
                   }).toList(),
                 ),
@@ -299,7 +300,7 @@ class _HomeTabState extends State<_HomeTab> {
                       icon: Icons.note_outlined,
                       title: 'Note: ${note.title}',
                       description: note.category,
-                      iconColor: note.isFavorite ? Colors.red : Colors.blue,
+                      iconColor: note.isFavorite ? Colors.red : AppColors.peach900,
                     );
                   }).toList(),
                 ),

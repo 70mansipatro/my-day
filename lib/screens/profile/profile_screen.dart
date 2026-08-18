@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/app_colors.dart';
 import '../../app/routes.dart';
 import '../../providers/auth_provider.dart';
 import 'settings_screen.dart';
@@ -39,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: const Center(
-                      child: Icon(Icons.person, size: 40, color: Colors.white),
+                      child: Icon(Icons.person, size: 40, color: AppColors.gray800),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -53,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     user?.email ?? '',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey.shade600,
+                      color: AppColors.gray600,
                     ),
                   ),
                 ],

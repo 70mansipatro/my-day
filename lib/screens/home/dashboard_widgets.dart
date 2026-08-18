@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/app_colors.dart';
+
 /// Summary card for dashboard
 class DashboardSummaryCard extends StatelessWidget {
   final String title;
@@ -27,10 +29,10 @@ class DashboardSummaryCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (iconColor ?? Colors.blue).withValues(alpha: 0.1),
+                color: (iconColor ?? AppColors.peach900).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: iconColor ?? Colors.blue, size: 28),
+              child: Icon(icon, color: iconColor ?? AppColors.peach900, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -47,7 +49,7 @@ class DashboardSummaryCard extends StatelessWidget {
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
+                      color: AppColors.gray600,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -106,13 +108,13 @@ class TaskProgressCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
+                    color: AppColors.peach100,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '${completionRate.toStringAsFixed(0)}%',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Colors.green,
+                      color: AppColors.peach900,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -187,13 +189,13 @@ class HabitProgressCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.1),
+                    color: AppColors.peach100,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '${completionRate.toStringAsFixed(0)}%',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Colors.orange,
+                      color: AppColors.peach900,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -218,7 +220,7 @@ class HabitProgressCard extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.local_fire_department,
-                  color: Colors.red,
+                  color: AppColors.peach900,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -293,7 +295,7 @@ class NotesSummaryCard extends StatelessWidget {
                     Text(
                       '$favorites Favorites',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
+                        color: AppColors.gray600,
                       ),
                     ),
                   ],
@@ -371,7 +373,7 @@ class WeeklyProgressCard extends StatelessWidget {
                       width: 30,
                       height: height,
                       decoration: BoxDecoration(
-                        color: Colors.blue.withValues(alpha: 0.7),
+                        color: AppColors.peach500,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(4),
                         ),
@@ -419,10 +421,10 @@ class RecentActivityItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (iconColor ?? Colors.blue).withValues(alpha: 0.1),
+              color: (iconColor ?? AppColors.peach900).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: iconColor ?? Colors.blue, size: 20),
+            child: Icon(icon, color: iconColor ?? AppColors.peach900, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -440,7 +442,7 @@ class RecentActivityItem extends StatelessWidget {
                   description,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.gray600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -452,7 +454,7 @@ class RecentActivityItem extends StatelessWidget {
               time!,
               style: Theme.of(
                 context,
-              ).textTheme.labelSmall?.copyWith(color: Colors.grey.shade500),
+              ).textTheme.labelSmall?.copyWith(color: AppColors.gray400),
             ),
         ],
       ),
@@ -529,7 +531,7 @@ class EmptyDashboardState extends StatelessWidget {
             Icon(
               Icons.dashboard_outlined,
               size: 64,
-              color: Colors.grey.shade300,
+              color: AppColors.gray300,
             ),
             const SizedBox(height: 16),
             Text(
@@ -544,7 +546,7 @@ class EmptyDashboardState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.gray600),
             ),
             const SizedBox(height: 24),
             QuickActionsRow(

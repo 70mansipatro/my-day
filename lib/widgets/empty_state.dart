@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../app/app_colors.dart';
+
 /// A reusable placeholder shown when a list has no items yet.
 class EmptyState extends StatelessWidget {
   final IconData icon;
@@ -21,7 +23,7 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 72, color: Colors.grey.shade400),
+            Icon(icon, size: 72, color: AppColors.gray400),
             const SizedBox(height: 16),
             Text(
               title,
@@ -34,7 +36,7 @@ class EmptyState extends StatelessWidget {
               style: Theme.of(context)
                   .textTheme
                   .bodyMedium
-                  ?.copyWith(color: Colors.grey.shade600),
+                  ?.copyWith(color: AppColors.gray600),
               textAlign: TextAlign.center,
             ),
           ],

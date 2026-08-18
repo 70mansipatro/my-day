@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../app/app_colors.dart';
 import '../../models/habit_model.dart';
 import '../../providers/habit_provider.dart';
 import 'add_habit_screen.dart';
@@ -153,6 +154,7 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
                 children: [
                   _StatTile(
                     icon: Icons.local_fire_department,
+                    iconColor: AppColors.peach900,
                     label: 'Current Streak',
                     value: '${stats['currentStreak'] ?? 0} days',
                   ),
@@ -240,11 +242,13 @@ class _InfoChip extends StatelessWidget {
 
 class _StatTile extends StatelessWidget {
   final IconData icon;
+  final Color? iconColor;
   final String label;
   final String value;
 
   const _StatTile({
     required this.icon,
+    this.iconColor,
     required this.label,
     required this.value,
   });
@@ -259,7 +263,7 @@ class _StatTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon),
+              Icon(icon, color: iconColor),
               const SizedBox(height: 8),
               Text(label, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 4),
